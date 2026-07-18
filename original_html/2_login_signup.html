@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DermaScreen | Clinical Authentication</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed-variant": "#005320",
+                    "primary-container": "#00873a",
+                    "surface": "#f8f9ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#eff4ff",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "on-surface-variant": "#3e4a3d",
+                    "surface-container-high": "#dee9fc",
+                    "primary-fixed-dim": "#62df7d",
+                    "on-tertiary-fixed-variant": "#444749",
+                    "background": "#f8f9ff",
+                    "on-background": "#121c2a",
+                    "on-secondary-fixed": "#042014",
+                    "on-primary-container": "#f7fff2",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed": "#e0e3e5",
+                    "surface-container": "#e6eeff",
+                    "on-background": "#121c2a",
+                    "secondary-fixed": "#caead6",
+                    "inverse-surface": "#27313f",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#121c2a",
+                    "on-tertiary-container": "#fbfdff",
+                    "primary-fixed": "#7ffc97",
+                    "secondary": "#486554",
+                    "surface-container-highest": "#d9e3f6",
+                    "tertiary-fixed": "#e0e3e5",
+                    "secondary-fixed-dim": "#afceba",
+                    "secondary-container": "#caead6",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#191c1e",
+                    "outline": "#6e7b6c",
+                    "on-primary-fixed": "#002109",
+                    "primary": "#006b2c",
+                    "error-container": "#ffdad6",
+                    "surface-bright": "#f8f9ff",
+                    "surface-tint": "#006e2d",
+                    "inverse-primary": "#62df7d",
+                    "on-secondary-fixed-variant": "#314d3e",
+                    "on-error": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#d9e3f6",
+                    "on-secondary-container": "#4e6b5a",
+                    "surface-dim": "#d0dbed",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#eaf1ff",
+                    "outline-variant": "#bdcaba",
+                    "tertiary": "#595c5e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "40px",
+                    "xl": "3rem",
+                    "gutter": "24px",
+                    "md": "1.5rem",
+                    "xs": "0.5rem",
+                    "base": "4px",
+                    "lg": "2rem",
+                    "sm": "1rem",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "headline-xl": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "body-lg": ["Inter"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9ff;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .transition-soft {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Custom Checkbox */
+        input[type="checkbox"] {
+            appearance: none;
+            background-color: #ffffff;
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.15em;
+            height: 1.15em;
+            border: 2px solid #bdcaba;
+            border-radius: 4px;
+            display: grid;
+            place-content: center;
+        }
+        input[type="checkbox"]::before {
+            content: "";
+            width: 0.65em;
+            height: 0.65em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em #006b2c;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        input[type="checkbox"]:checked::before {
+            transform: scale(1);
+        }
+        input[type="checkbox"]:checked {
+            border-color: #006b2c;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 md:p-0 overflow-x-hidden">
+<!-- Split Layout Container -->
+<main class="w-full max-w-[1280px] min-h-[800px] flex overflow-hidden rounded-3xl bg-white shadow-xl">
+<!-- Left Section: Authentication Form -->
+<section class="w-full lg:w-1/2 flex flex-col p-8 md:p-16 lg:p-20 justify-center">
+<!-- Logo & Brand Header -->
+<div class="mb-12">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">medical_services</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">DermaScreen</h1>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">AI-Powered Clinical Dermatology Assistant</p>
+</div>
+<!-- Toggle Tabs (Simple implementation for UI purposes) -->
+<div class="flex gap-8 mb-10 border-b border-outline-variant">
+<button class="pb-4 font-label-md text-label-md text-primary border-b-2 border-primary transition-soft" id="login-tab">Sign In</button>
+<button class="pb-4 font-label-md text-label-md text-on-surface-variant hover:text-primary transition-soft" id="signup-tab">Create Account</button>
+</div>
+<!-- Form -->
+<form class="space-y-6" id="auth-form">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface" for="email">Email Address</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+</div>
+<input class="w-full pl-11 pr-4 py-3 bg-white border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary-container focus:border-primary outline-none transition-soft font-body-md text-body-md" id="email" placeholder="practitioner@clinic.com" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface" for="password">Password</label>
+<a class="text-label-sm font-label-sm text-primary hover:underline" href="#">Forgot password?</a>
+</div>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-outline">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+</div>
+<input class="w-full pl-11 pr-12 py-3 bg-white border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary-container focus:border-primary outline-none transition-soft font-body-md text-body-md" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute inset-y-0 right-0 pr-4 flex items-center text-outline hover:text-primary transition-colors" onclick="togglePassword()" type="button">
+<span class="material-symbols-outlined text-[20px]" id="password-toggle-icon">visibility</span>
+</button>
+</div>
+</div>
+<!-- Remember Me -->
+<div class="flex items-center gap-3">
+<input id="remember" type="checkbox"/>
+<label class="font-body-sm text-body-sm text-on-surface-variant cursor-pointer" for="remember">Remember me on this device</label>
+</div>
+<!-- Action Buttons -->
+<div class="pt-4 space-y-4">
+<button class="w-full h-12 bg-primary text-on-primary font-label-md text-label-md rounded-xl hover:shadow-lg active:scale-[0.98] transition-soft" type="submit">
+                        Access Dashboard
+                    </button>
+<div class="relative py-2">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-outline-variant"></div>
+</div>
+<div class="relative flex justify-center text-sm">
+<span class="px-4 bg-white text-on-surface-variant font-label-sm">Or continue with</span>
+</div>
+</div>
+<button class="w-full h-12 flex items-center justify-center gap-3 border border-outline-variant text-on-surface font-label-md text-label-md rounded-xl hover:bg-surface-container-low transition-soft" type="button">
+<svg class="w-5 h-5" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z" fill="#EA4335"></path>
+</svg>
+                        Sign in with Google
+                    </button>
+</div>
+</form>
+<!-- Footer Legal -->
+<div class="mt-auto pt-10 text-center">
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Authorized personnel only. By accessing this system, you agree to our 
+                    <a class="text-primary hover:underline" href="#">Privacy Policy</a> and <a class="text-primary hover:underline" href="#">Terms of Service</a>.
+                </p>
+</div>
+</section>
+<!-- Right Section: Illustration & Branding -->
+<section class="hidden lg:flex w-1/2 relative bg-surface-container overflow-hidden">
+<!-- Background Graphic -->
+<div class="absolute inset-0 opacity-10">
+<div class="absolute top-[-10%] right-[-10%] w-[80%] h-[80%] rounded-full bg-primary-container blur-[120px]"></div>
+<div class="absolute bottom-[-5%] left-[-5%] w-[60%] h-[60%] rounded-full bg-secondary-container blur-[100px]"></div>
+</div>
+<div class="relative z-10 w-full h-full flex flex-col items-center justify-center p-16 text-center">
+<div class="relative w-full max-w-[480px] aspect-square mb-12 transform hover:scale-105 transition-soft duration-700">
+<!-- Glass Background Card -->
+<div class="absolute inset-0 rounded-[40px] bg-white/40 backdrop-blur-md border border-white/40 shadow-2xl"></div>
+<!-- Content Simulation/Illustration Image -->
+<div class="absolute inset-4 rounded-[32px] overflow-hidden">
+<div class="w-full h-full bg-cover bg-center" data-alt="A professional medical illustration showing a modern dermatology clinic setup. A high-tech digital microscope is focused on a skin sample, with a holographic UI overlay displaying neural network pathways and diagnostic heatmaps. The lighting is clinical yet warm, with emerald green and soft blue tones reflecting a premium healthcare SaaS environment. The style is minimalist 3D rendering with a focus on precision and clinical trust." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBrl-bPAELjpmEUkIHu-eZcFFV_iFL4CfxgsnpH4AgNc4FtxcB-lRQCjZV2es4Du7ou3phjKaqMCNvisKGV0_j8ZQz55E6Iw-ZbrGB9uL8djs33kQuNaJPhUwwGC0IIQhF09NA7Ns-iPXfUegt4iLCcmbhv3LlgSGh28qDABIk0U7vzvd8UotdtmC97Z0WGKMpa-UBn-sy6dz7cdZdyN9F1jfF9SngczO-7iWAi8mnw6JQO_IiL5RlS-Q')">
+</div>
+</div>
+<!-- Floating UI elements for visual depth -->
+<div class="absolute -top-6 -right-6 glass-panel p-4 rounded-2xl shadow-lg border border-white/50 flex items-center gap-3 animate-bounce-slow">
+<div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="text-left">
+<p class="font-label-sm text-on-surface leading-tight">99.8% Accuracy</p>
+<p class="text-[10px] text-on-surface-variant">Validated clinical AI</p>
+</div>
+</div>
+<div class="absolute -bottom-4 -left-8 glass-panel p-4 rounded-2xl shadow-lg border border-white/50 flex items-center gap-3 animate-float">
+<div class="w-8 h-8 bg-secondary-container rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<div class="text-left">
+<p class="font-label-sm text-on-surface leading-tight">HIPAA Compliant</p>
+<p class="text-[10px] text-on-surface-variant">Encrypted patient data</p>
+</div>
+</div>
+</div>
+<div class="max-w-md space-y-4">
+<h2 class="font-headline-lg text-headline-lg text-on-background">Advanced Diagnostic Intelligence</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+                        Empowering practitioners with state-of-the-art vision models for rapid, accurate skin analysis and longitudinal tracking.
+                    </p>
+</div>
+</div>
+</section>
+</main>
+<!-- Background Elements -->
+<div class="fixed top-0 left-0 w-full h-full -z-10 bg-surface">
+<div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-container/10 rounded-full blur-[100px] animate-pulse"></div>
+<div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary-container/10 rounded-full blur-[100px] animate-pulse" style="animation-delay: 2s;"></div>
+</div>
+<script>
+        // Micro-interactions and simple UI logic
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('password-toggle-icon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = 'visibility_off';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = 'visibility';
+            }
+        }
+
+        const loginTab = document.getElementById('login-tab');
+        const signupTab = document.getElementById('signup-tab');
+        const submitBtn = document.querySelector('button[type="submit"]');
+
+        signupTab.addEventListener('click', () => {
+            signupTab.classList.add('text-primary', 'border-b-2', 'border-primary');
+            signupTab.classList.remove('text-on-surface-variant');
+            loginTab.classList.remove('text-primary', 'border-b-2', 'border-primary');
+            loginTab.classList.add('text-on-surface-variant');
+            submitBtn.textContent = 'Create New Account';
+        });
+
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.add('text-primary', 'border-b-2', 'border-primary');
+            loginTab.classList.remove('text-on-surface-variant');
+            signupTab.classList.remove('text-primary', 'border-b-2', 'border-primary');
+            signupTab.classList.add('text-on-surface-variant');
+            submitBtn.textContent = 'Access Dashboard';
+        });
+
+        // Form submission animation
+        document.getElementById('auth-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white inline mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Authenticating...
+            `;
+            setTimeout(() => {
+                alert('In a real application, you would be redirected now.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = loginTab.classList.contains('text-primary') ? 'Access Dashboard' : 'Create New Account';
+            }, 1500);
+        });
+    </script>
+<style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+        .animate-bounce-slow {
+            animation: bounce-slow 3s ease-in-out infinite;
+        }
+    </style>
+</body></html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DermaScreen AI Assistant</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#005320",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#3e4a3d",
+                        "inverse-on-surface": "#eaf1ff",
+                        "tertiary-container": "#727577",
+                        "background": "#f8f9ff",
+                        "on-tertiary-fixed": "#191c1e",
+                        "secondary-container": "#caead6",
+                        "on-surface": "#121c2a",
+                        "on-secondary-fixed": "#042014",
+                        "secondary-fixed": "#caead6",
+                        "primary-container": "#00873a",
+                        "on-primary-container": "#f7fff2",
+                        "tertiary": "#595c5e",
+                        "outline": "#6e7b6c",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "surface-dim": "#d0dbed",
+                        "on-secondary-container": "#4e6b5a",
+                        "surface-container-highest": "#d9e3f6",
+                        "outline-variant": "#bdcaba",
+                        "on-tertiary-container": "#fbfdff",
+                        "on-primary-fixed": "#002109",
+                        "on-error-container": "#93000a",
+                        "on-background": "#121c2a",
+                        "tertiary-fixed": "#e0e3e5",
+                        "surface-container-high": "#dee9fc",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "inverse-surface": "#27313f",
+                        "inverse-primary": "#62df7d",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#62df7d",
+                        "surface-container": "#e6eeff",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#afceba",
+                        "secondary": "#486554",
+                        "on-primary": "#ffffff",
+                        "primary": "#006b2c",
+                        "on-secondary-fixed-variant": "#314d3e",
+                        "surface-variant": "#d9e3f6",
+                        "surface-tint": "#006e2d",
+                        "primary-fixed": "#7ffc97"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "3rem",
+                        "margin-mobile": "16px",
+                        "base": "4px",
+                        "lg": "2rem",
+                        "gutter": "24px",
+                        "md": "1.5rem",
+                        "sm": "1rem",
+                        "margin-desktop": "40px",
+                        "xs": "0.5rem"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chat-container {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 107, 44, 0.2) transparent;
+        }
+        .chat-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 107, 44, 0.2);
+            border-radius: 10px;
+        }
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        .dot {
+            animation: typing 1s infinite ease-in-out;
+        }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        .glass-header {
+            background: rgba(248, 249, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-surface overflow-hidden">
+<!-- Top Navigation Shell (Fixed) -->
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-margin-desktop h-16 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md font-bold text-primary">DermaScreen</span>
+<div class="hidden md:flex gap-6 ml-8">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Scan History</a>
+<a class="font-label-md text-label-md text-primary border-b-2 border-primary" href="#">AI Assistant</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional portrait of a clinical dermatologist in a high-end medical facility. The background is softly blurred with medical monitors and cool white lighting. The doctor has a friendly, trustworthy expression, wearing a clean white lab coat with an emerald green logo pin, reflecting a premium healthcare aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDV1xhE_tXPBT5jVVrZE3rBy37lVEi77-tHV7SVMPMOP9tw2LmzdshMr_MWcHbgfwuwaErpUPpu6OA_wjNn6F_dsLyHeQLl79F6mI9xxq1I8Y91_5IWLgy4z5buT86VTZ60oT_Yl_c1GILueD4IUQ0wuaZpFDGtvq7cH_lzflXr9wELiDpshkYP1nvOlux6YqcJYzBdTuk3H0Sofsw0GEUnJfWIpF7kmwBHeQlIarI43n7EuUZocEyHIQ"/>
+</div>
+</div>
+</header>
+<!-- Side Navigation Shell (Desktop) -->
+<nav class="hidden lg:flex flex-col fixed left-0 top-16 h-[calc(100vh-64px)] w-64 p-4 border-r border-outline-variant bg-surface z-40">
+<div class="flex flex-col gap-2 flex-grow">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined">add_a_photo</span>
+<span class="font-label-md text-label-md">New Scan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md text-label-md">Scan History</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-xl translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-md text-label-md">AI Assistant</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+</div>
+<div class="border-t border-outline-variant pt-4 flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="lg:ml-64 mt-16 h-[calc(100vh-64px)] flex flex-col relative bg-surface-bright">
+<!-- Chat Area -->
+<div class="flex-grow flex flex-col max-w-4xl mx-auto w-full px-margin-mobile md:px-margin-desktop py-8 chat-container overflow-y-auto pb-40">
+<!-- System Welcome Message -->
+<div class="flex flex-col items-center text-center mb-10">
+<div class="w-16 h-16 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-4xl">smart_toy</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-on-surface mb-2">Hello, Dr. Sarah</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">I'm your AI Clinical Assistant. How can I help you with your skin analysis today?</p>
+</div>
+<!-- Chat History -->
+<div class="space-y-6">
+<!-- User Bubble -->
+<div class="flex justify-end">
+<div class="bg-primary text-on-primary rounded-2xl rounded-tr-none px-6 py-4 max-w-[80%] shadow-sm">
+<p class="font-body-md text-body-md">Can you explain the ABCDE criteria for melanoma screening?</p>
+</div>
+</div>
+<!-- AI Bubble -->
+<div class="flex justify-start gap-4">
+<div class="w-8 h-8 flex-shrink-0 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">smart_toy</span>
+</div>
+<div class="bg-white border border-outline-variant rounded-2xl rounded-tl-none px-6 py-4 max-w-[80%] shadow-sm">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                            The ABCDE criteria is a recognized medical framework for early detection:
+                            </p><ul class="list-disc ml-4 mt-2 space-y-1">
+<li><strong>A (Asymmetry):</strong> One half doesn't match the other.</li>
+<li><strong>B (Border):</strong> Irregular, scalloped, or poorly defined edges.</li>
+<li><strong>C (Color):</strong> Variations of color (brown, black, tan, red, blue).</li>
+<li><strong>D (Diameter):</strong> Usually larger than 6mm (pencil eraser).</li>
+<li><strong>E (Evolving):</strong> Changing in size, shape, or color over time.</li>
+</ul>
+<p></p>
+</div>
+</div>
+<!-- User Bubble -->
+<div class="flex justify-end">
+<div class="bg-primary text-on-primary rounded-2xl rounded-tr-none px-6 py-4 max-w-[80%] shadow-sm">
+<p class="font-body-md text-body-md">What does "Suspicious" mean in the latest report for Patient #4492?</p>
+</div>
+</div>
+<!-- AI Typing Animation -->
+<div class="flex justify-start gap-4">
+<div class="w-8 h-8 flex-shrink-0 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">smart_toy</span>
+</div>
+<div class="bg-white border border-outline-variant rounded-2xl rounded-tl-none px-6 py-4 shadow-sm flex items-center gap-1.5">
+<div class="w-2 h-2 bg-primary/40 rounded-full dot"></div>
+<div class="w-2 h-2 bg-primary/40 rounded-full dot"></div>
+<div class="w-2 h-2 bg-primary/40 rounded-full dot"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Interaction Layer -->
+<div class="absolute bottom-0 left-0 right-0 p-margin-mobile md:p-margin-desktop glass-header border-t border-outline-variant">
+<div class="max-w-4xl mx-auto space-y-4">
+<!-- Suggested Questions -->
+<div class="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
+<button class="flex-shrink-0 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/10 transition-all px-4 py-2 rounded-full text-on-surface-variant font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">help</span>
+                        What does Suspicious mean?
+                    </button>
+<button class="flex-shrink-0 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/10 transition-all px-4 py-2 rounded-full text-on-surface-variant font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">calendar_month</span>
+                        How often should I perform a skin check?
+                    </button>
+<button class="flex-shrink-0 bg-white border border-outline-variant hover:border-primary hover:bg-primary-container/10 transition-all px-4 py-2 rounded-full text-on-surface-variant font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">medical_services</span>
+                        Dermoscopy techniques
+                    </button>
+</div>
+<!-- Input Field -->
+<div class="relative group">
+<input class="w-full bg-white border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-2xl px-6 py-4 pr-16 font-body-md text-body-md transition-all shadow-sm" placeholder="Ask about clinical guidelines, patient reports, or screening techniques..." type="text"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-primary text-on-primary rounded-xl flex items-center justify-center hover:bg-on-primary-fixed-variant transition-colors group-focus-within:scale-105 active:scale-95">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+<!-- Medical Disclaimer -->
+<p class="text-center font-label-sm text-label-sm text-on-surface-variant/70 italic">
+                    The AI Assistant provides educational guidance only and does not provide medical diagnosis.
+                </p>
+</div>
+</div>
+</main>
+<!-- Bottom NavBar (Mobile Only) -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface/90 backdrop-blur-lg border-t border-outline-variant shadow-lg">
+<button class="flex flex-col items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-label-sm text-label-sm">New Scan</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-sm text-label-sm">History</span>
+</button>
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 scale-90">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-sm text-label-sm">AI</span>
+</div>
+<button class="flex flex-col items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</button>
+</nav>
+<script>
+        // Simple Micro-interaction for input focus
+        const input = document.querySelector('input');
+        const suggestButtons = document.querySelectorAll('button.flex-shrink-0');
+
+        suggestButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const query = btn.textContent.trim().replace('help', '').replace('calendar_month', '').replace('medical_services', '');
+                input.value = query;
+                input.focus();
+            });
+        });
+
+        // Clear active navigation highlights on scroll or interaction if needed
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && input.value.trim() !== '') {
+                // Mock send logic
+                console.log('Sending message:', input.value);
+                input.value = '';
+            }
+        });
+    </script>
+</body></html>

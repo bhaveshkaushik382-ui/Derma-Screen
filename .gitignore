@@ -1,0 +1,122 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Snowpack dependency directory
+web_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional build/cache directories
+.npm
+.eslintcache
+.stylelintcache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Build outputs
+dist/
+dist-ssr/
+out/
+.next/
+.webpack/
+.serverless/
+.vuepress/dist
+.fusebox/
+.dynamodb/
+
+# Coverage and test directories
+lib-cov/
+coverage/
+.nyc_output/
+.cache/
+
+# Editor/IDE files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.tern-port
+
+# Operating System files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Python files and virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+venv/
+env/
+ENV/
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+htmlcov/
+.tox/
+.nosetests
+nosetests.xml
+syslog
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+doc/_build/
+
+# Secrets, private files, and Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+backend/.env
+firebase-service-account.json
+**/*service-account.json
+**/firebase-service-account.json

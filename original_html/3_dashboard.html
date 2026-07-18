@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>DermaScreen | User Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .sidebar-active {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        body {
+            background-color: #f8f9ff;
+            scroll-behavior: smooth;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #bdcaba;
+            border-radius: 10px;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed-variant": "#005320",
+                    "primary-container": "#00873a",
+                    "surface": "#f8f9ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#eff4ff",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "on-surface-variant": "#3e4a3d",
+                    "surface-container-high": "#dee9fc",
+                    "primary-fixed-dim": "#62df7d",
+                    "on-tertiary-fixed-variant": "#444749",
+                    "background": "#f8f9ff",
+                    "on-secondary-fixed": "#042014",
+                    "on-primary-container": "#f7fff2",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed": "#e0e3e5",
+                    "surface-container": "#e6eeff",
+                    "on-background": "#121c2a",
+                    "secondary-fixed": "#caead6",
+                    "inverse-surface": "#27313f",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#121c2a",
+                    "on-tertiary-container": "#fbfdff",
+                    "primary-fixed": "#7ffc97",
+                    "secondary": "#486554",
+                    "surface-container-highest": "#d9e3f6",
+                    "tertiary-container": "#727577",
+                    "secondary-fixed-dim": "#afceba",
+                    "secondary-container": "#caead6",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#191c1e",
+                    "outline": "#6e7b6c",
+                    "on-primary-fixed": "#002109",
+                    "primary": "#006b2c",
+                    "error-container": "#ffdad6",
+                    "surface-bright": "#f8f9ff",
+                    "surface-tint": "#006e2d",
+                    "inverse-primary": "#62df7d",
+                    "on-secondary-fixed-variant": "#314d3e",
+                    "on-error": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#d9e3f6",
+                    "on-secondary-container": "#4e6b5a",
+                    "surface-dim": "#d0dbed",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#eaf1ff",
+                    "outline-variant": "#bdcaba",
+                    "tertiary": "#595c5e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "40px",
+                    "xl": "3rem",
+                    "gutter": "24px",
+                    "md": "1.5rem",
+                    "xs": "0.5rem",
+                    "base": "4px",
+                    "lg": "2rem",
+                    "sm": "1rem",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "headline-xl": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "body-lg": ["Inter"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="font-body-md text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-margin-desktop h-16 bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-headline-md font-bold text-primary">DermaScreen</span>
+<div class="hidden md:flex items-center bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant w-96">
+<span class="material-symbols-outlined text-on-surface-variant mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-full" placeholder="Search patients or scan history..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-full relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-full">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+<div class="text-right hidden sm:block">
+<p class="font-label-md text-on-surface">Dr. Sarah Mitchell</p>
+<p class="text-xs text-on-surface-variant">Dermatologist</p>
+</div>
+<img class="w-10 h-10 rounded-full object-cover border-2 border-primary-fixed" data-alt="A professional medical practitioner profile headshot. A woman with a kind expression, wearing a white lab coat and a stethoscope, set against a bright, clinical, minimalist studio background with soft lighting and a clean, high-end healthcare aesthetic using muted tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDy_Fi6oJQzIAEpvsKDorCs7N_eYWHzIKWt8WpKrBfZ-6qA-rI0whG_3e3mZ0rMGPT3TNvpmYttVoO3fC0YrgJQtkUYYf0MPV4vEiW26qVSNwJpVK83I0WcIEnLWqQKqFsUhq6VxxgZ1RsTVaWngLfCtjizPaAtIFQVw0elxQEP-neea6MtnPBiuXiMdzzLnsvZATPpTV9Y1d7nZmBHfcP7hFXxXlOVycs467xqWJKKH-v0HwEfSSJjIw"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="hidden lg:flex flex-col fixed left-0 top-0 h-full w-64 p-4 z-40 bg-surface border-r border-outline-variant pt-20">
+<div class="flex flex-col gap-1 flex-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-xl translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">add_a_photo</span>
+<span class="font-label-md">New Scan</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-md">Scan History</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-md">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-md">AI Assistant</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md">Profile</span>
+</a>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-error hover:bg-error-container/20 transition-all rounded-xl" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="lg:ml-64 pt-24 pb-20 px-4 md:px-margin-desktop min-h-screen">
+<div class="max-w-7xl mx-auto">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-background">Good morning, Dr. Mitchell</h1>
+<p class="text-body-md text-on-surface-variant mt-1">Here is the diagnostic summary for your clinical cases today.</p>
+</div>
+<button class="bg-primary text-on-primary px-6 py-3 rounded-xl font-label-md flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:bg-primary-container transition-all active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+                    Start New Scan
+                </button>
+</div>
+<!-- Stats Bento Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter mb-8">
+<div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-primary">analytics</span>
+</div>
+<span class="text-xs font-bold text-primary bg-primary/5 px-2 py-1 rounded-full">+12%</span>
+</div>
+<p class="text-on-surface-variant text-label-md uppercase tracking-wider">Total Scans</p>
+<h3 class="font-headline-md text-headline-md mt-1">1,284</h3>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-secondary/10 rounded-lg">
+<span class="material-symbols-outlined text-secondary">calendar_today</span>
+</div>
+</div>
+<p class="text-on-surface-variant text-label-md uppercase tracking-wider">Last Scan Date</p>
+<h3 class="font-headline-md text-headline-md mt-1">Oct 24, 2023</h3>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-tertiary/10 rounded-lg">
+<span class="material-symbols-outlined text-tertiary">check_circle</span>
+</div>
+<span class="text-xs font-bold text-tertiary bg-tertiary/5 px-2 py-1 rounded-full">High</span>
+</div>
+<p class="text-on-surface-variant text-label-md uppercase tracking-wider">Avg. Confidence</p>
+<h3 class="font-headline-md text-headline-md mt-1">96.8%</h3>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant border-l-4 border-l-error hover:shadow-md transition-shadow">
+<div class="flex items-center justify-between mb-4">
+<div class="p-2 bg-error/10 rounded-lg">
+<span class="material-symbols-outlined text-error">warning</span>
+</div>
+<span class="text-xs font-bold text-error bg-error/10 px-2 py-1 rounded-full">Critical</span>
+</div>
+<p class="text-on-surface-variant text-label-md uppercase tracking-wider">High Risk Alerts</p>
+<h3 class="font-headline-md text-headline-md mt-1">04</h3>
+</div>
+</div>
+<!-- Main Content Area -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Left Column: Recent Activity -->
+<div class="lg:col-span-2 space-y-gutter">
+<div class="bg-surface-container-lowest rounded-2xl border border-outline-variant overflow-hidden">
+<div class="px-6 py-5 border-b border-outline-variant flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-on-surface">Recent Scans</h2>
+<button class="text-primary font-label-md hover:underline">View All</button>
+</div>
+<div class="divide-y divide-outline-variant">
+<!-- Activity Item -->
+<div class="p-6 flex flex-col sm:flex-row items-center gap-6 hover:bg-surface-container-low transition-colors group cursor-pointer">
+<div class="relative w-full sm:w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A high-resolution clinical macro photograph of a skin lesion on fair skin. The image is captured under professional medical lighting with a neutral gray background. The style is scientific and detailed, following a modern healthcare diagnostic interface aesthetic with high clarity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBf6t_3CgjVDu3JUEa21CTmKXiz1yqBqqwvXo8vvuWYtb4431D7F_5OvxW6zUe6_QqI75RHf5NEh-7YE1RcrUwXqHIjuyqWjY7nq1MSW7KNy3s3VOqCgvPZnoeFm_7RQKw1pYJNXUdxKuKg4JPb8GvbzHBq-pp4V4xM7pcygkH_lZSvkjxkMCL1cqkJQo0qdApejK6eQ7DxLpZdiAlYm68pRm48yXG4s__u_SjBp8yOX90YSv_XjzQwAA"/>
+<div class="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+<div class="flex-1 space-y-1 w-full">
+<div class="flex items-center justify-between">
+<h4 class="font-label-md text-on-surface text-lg">Patient #821-A</h4>
+<span class="text-xs text-on-surface-variant">2 hours ago</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            Benign
+                                        </span>
+<span class="text-body-sm text-on-surface-variant">Confidence: 98.2%</span>
+</div>
+<p class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Left Forearm - Nevus check
+                                    </p>
+</div>
+<button class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<!-- Activity Item -->
+<div class="p-6 flex flex-col sm:flex-row items-center gap-6 hover:bg-surface-container-low transition-colors group cursor-pointer">
+<div class="relative w-full sm:w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A medical close-up of a suspicious dermatological mark. The photo uses clinical lighting, highlighting texture and color variation. The environment is a clean medical office, maintaining a high-end, reliable pharmaceutical and technological vibe with emerald green accents in the periphery." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhH66DvzXeVMk6mj_WilzfgIrTLt_N0C48ymPnv1XVTGsLhblZUG6j-pWbxEPfHmJkXwK_ShNb44tvleYFgbVnkp1fSZu-fZwO9_JejaBw_SuBHS_pGcywvy_Nx5eVGBKkm7j3ByLcZughvBo2BQlJIMQHQA4yHoZvJlyF4fDhHpJsQ9e3f6m04jffbjMAS47IaUbGzqeT_Fsp-f7QkxKjsaZe95TxHi4cmIfpAT64bTroxFOCeCATcw"/>
+</div>
+<div class="flex-1 space-y-1 w-full">
+<div class="flex items-center justify-between">
+<h4 class="font-label-md text-on-surface text-lg">Patient #744-C</h4>
+<span class="text-xs text-on-surface-variant">5 hours ago</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-error-container text-error">
+                                            Suspicious
+                                        </span>
+<span class="text-body-sm text-on-surface-variant">Confidence: 91.5%</span>
+</div>
+<p class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Upper Back - Irregular border
+                                    </p>
+</div>
+<button class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<!-- Activity Item -->
+<div class="p-6 flex flex-col sm:flex-row items-center gap-6 hover:bg-surface-container-low transition-colors group cursor-pointer">
+<div class="relative w-full sm:w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A medical professional's perspective of a skin examination. Detail-oriented and clean, with soft ambient clinic lighting. The focus is on precision and digital health monitoring. The color palette emphasizes whites and soft greens to match the DermaScreen emerald brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkxvha6betPvp_ZmUL99ocnJYToQ6sfvdpRmeBG1tcDNkRBYjyargMnIS30R5Fbr8lc5TojgGXsdhfGLqMiLHSoX4kE4gkursq80Q2OLxvDfIvZhuCCe8umWanT3mFAWrGe94DmRozCVoVHY4qahuOnFtdUgBm0aPPOAWYFgKZjyVr0HV9opMuAJaWyljEwkOy5s0WYTz-eKmO3dJ7KucyLZhYL0V8adpYJI9e6BhdfcXEUCK1zWjWhA"/>
+</div>
+<div class="flex-1 space-y-1 w-full">
+<div class="flex items-center justify-between">
+<h4 class="font-label-md text-on-surface text-lg">Patient #902-B</h4>
+<span class="text-xs text-on-surface-variant">Yesterday</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            Benign
+                                        </span>
+<span class="text-body-sm text-on-surface-variant">Confidence: 99.1%</span>
+</div>
+<p class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span> Scalp - Routine follow-up
+                                    </p>
+</div>
+<button class="p-2 rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Scan Trends Chart Placeholder -->
+<div class="bg-surface-container-lowest rounded-2xl border border-outline-variant p-6 h-[400px] flex flex-col">
+<div class="flex items-center justify-between mb-8">
+<h2 class="font-headline-md text-headline-md text-on-surface">Monthly Scan Trend</h2>
+<select class="bg-surface-container-low border-outline-variant rounded-lg text-xs font-label-md focus:ring-primary focus:border-primary">
+<option>Last 6 Months</option>
+<option>Last Year</option>
+</select>
+</div>
+<div class="flex-1 flex items-end gap-2 md:gap-4 px-2">
+<!-- Mockup Chart Bars -->
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary-fixed-dim rounded-t-lg transition-all group-hover:bg-primary" style="height: 45%;"></div>
+<span class="text-[10px] text-on-surface-variant font-medium">MAY</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary-fixed-dim rounded-t-lg transition-all group-hover:bg-primary" style="height: 60%;"></div>
+<span class="text-[10px] text-on-surface-variant font-medium">JUN</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary-fixed-dim rounded-t-lg transition-all group-hover:bg-primary" style="height: 55%;"></div>
+<span class="text-[10px] text-on-surface-variant font-medium">JUL</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary-fixed-dim rounded-t-lg transition-all group-hover:bg-primary" style="height: 85%;"></div>
+<span class="text-[10px] text-on-surface-variant font-medium">AUG</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary-fixed-dim rounded-t-lg transition-all group-hover:bg-primary" style="height: 70%;"></div>
+<span class="text-[10px] text-on-surface-variant font-medium">SEP</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary rounded-t-lg transition-all" style="height: 95%;"></div>
+<span class="text-[10px] text-on-surface font-bold">OCT</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column -->
+<div class="space-y-gutter">
+<!-- Quick Actions -->
+<div class="bg-surface-container-lowest rounded-2xl border border-outline-variant p-6 space-y-4">
+<h3 class="font-label-md text-on-surface-variant uppercase tracking-wider text-xs">Quick Actions</h3>
+<div class="grid grid-cols-1 gap-3">
+<button class="w-full flex items-center justify-between p-4 rounded-xl border border-outline-variant hover:bg-surface-container-low hover:border-primary transition-all">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">description</span>
+<span class="font-label-md">Generate Full Report</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">open_in_new</span>
+</button>
+<button class="w-full flex items-center justify-between p-4 rounded-xl border border-outline-variant hover:bg-surface-container-low hover:border-primary transition-all">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">groups</span>
+<span class="font-label-md">Consult Specialist</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">open_in_new</span>
+</button>
+<button class="w-full flex items-center justify-between p-4 rounded-xl border border-outline-variant hover:bg-surface-container-low hover:border-primary transition-all">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">archive</span>
+<span class="font-label-md">Export History</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">download</span>
+</button>
+</div>
+</div>
+<!-- AI Assistant Shortcut -->
+<div class="relative overflow-hidden bg-primary-container rounded-2xl p-6 text-on-primary-container shadow-xl">
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-label-md uppercase tracking-widest text-xs opacity-80">AI Clinical Assistant</span>
+</div>
+<h4 class="font-headline-md text-headline-md leading-tight mb-2">Need help with a diagnosis?</h4>
+<p class="text-body-sm mb-6 opacity-90">Upload multiple images for a longitudinal comparative analysis using our latest neural engine.</p>
+<button class="bg-white text-primary px-6 py-2.5 rounded-xl font-label-md hover:bg-primary-fixed transition-colors">
+                                Ask Assistant
+                            </button>
+</div>
+<!-- Abstract Background Decoration -->
+<div class="absolute -right-8 -bottom-8 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+<div class="absolute top-0 right-0 p-4 opacity-20">
+<span class="material-symbols-outlined text-8xl">clinical_notes</span>
+</div>
+</div>
+<!-- Risk Distribution Pie Chart Placeholder -->
+<div class="bg-surface-container-lowest rounded-2xl border border-outline-variant p-6">
+<h2 class="font-label-md text-on-surface mb-6">Risk Distribution</h2>
+<div class="flex items-center justify-center py-6">
+<div class="relative w-40 h-40 rounded-full border-[12px] border-primary" style="clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);">
+<div class="absolute inset-0 border-[12px] border-error" style="clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 20%);"></div>
+<div class="absolute inset-0 border-[12px] border-secondary" style="clip-path: polygon(50% 50%, 100% 20%, 100% 60%);"></div>
+<div class="absolute inset-0 flex items-center justify-center flex-col">
+<span class="text-2xl font-bold text-on-surface">1.2k</span>
+<span class="text-[10px] text-on-surface-variant font-label-md uppercase">Total</span>
+</div>
+</div>
+</div>
+<div class="space-y-2 mt-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-xs text-on-surface-variant">Low Risk (Benign)</span>
+</div>
+<span class="text-xs font-bold">78%</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-xs text-on-surface-variant">Moderate Risk</span>
+</div>
+<span class="text-xs font-bold">15%</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-error"></span>
+<span class="text-xs text-on-surface-variant">High Risk</span>
+</div>
+<span class="text-xs font-bold">7%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface/90 backdrop-blur-lg border-t border-outline-variant shadow-lg">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-label-sm">New Scan</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-sm">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-label-sm">AI</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm">Profile</span>
+</a>
+</nav>
+<!-- Simple Hover Interactivity -->
+<script>
+        document.querySelectorAll('.glass-card, .bg-surface-container-lowest').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.classList.add('shadow-md');
+                card.style.borderColor = '#006b2c';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.classList.remove('shadow-md');
+                card.style.borderColor = '#bdcaba';
+            });
+        });
+    </script>
+</body></html>
