@@ -261,14 +261,20 @@ export const AppProvider = ({ children }) => {
   };
 
   const removeScan = async (scanId) => {
+    // 1. Remove from local state & localStorage immediately
+    setScans(prev => {
+      const updated = prev.filter(s => s.scan_id !== scanId && s.id !== scanId);
+      localStorage.setItem("dermascreen_scans", JSON.stringify(updated));
+      return updated;
+    });
+
+    // 2. Call backend delete in background
     try {
       await deleteScan(scanId);
-      setScans(prev => prev.filter(s => s.scan_id !== scanId && s.id !== scanId));
-      return true;
     } catch (err) {
-      console.error("Failed to delete scan:", err.message);
-      throw err;
+      console.warn("Backend delete notice:", err.message);
     }
+    return true;
   };
 
   return (

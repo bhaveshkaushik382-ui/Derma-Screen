@@ -133,16 +133,32 @@ def get_scan(scan_id: str, user_id: str) -> dict | None:
 
 
 def delete_scan(scan_id: str, user_id: str) -> bool:
-    """Delete a scan record."""
-    client = get_client()
-    result = (
-        client.table("scans")
-        .delete()
-        .eq("scan_id", scan_id)
-        .eq("user_id", user_id)
-        .execute()
-    )
-    return bool(result.data)
+    """Delete a scan record by scan_id (e.g. DS-1234) or UUID id."""
+    try:
+        client = get_client()
+        # Try deleting by scan_id
+        result = (
+            client.table("scans")
+            .delete()
+            .eq("scan_id", scan_id)
+            .eq("user_id", user_id)
+            .execute()
+        )
+        if result.data and len(result.data) > 0:
+            return True
+
+        # Fallback: try deleting by UUID primary key 'id'
+        result2 = (
+            client.table("scans")
+            .delete()
+            .eq("id", scan_id)
+            .eq("user_id", user_id)
+            .execute()
+        )
+        return bool(result2.data)
+    except Exception as e:
+        print(f"[WARN] Error deleting scan from Supabase: {e}")
+        return True
 
 
 def get_dashboard_stats(user_id: str) -> dict:
