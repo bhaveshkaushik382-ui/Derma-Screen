@@ -22,13 +22,23 @@ export const AppProvider = ({ children }) => {
     firebaseUser: null,
   });
 
-  const [scans, setScans] = useState([]);
+  const [scans, setScans] = useState(() => {
+    const saved = localStorage.getItem("dermascreen_scans");
+    return saved ? JSON.parse(saved) : [];
+  });
   const [messages, setMessages] = useState(() => {
     const saved = localStorage.getItem("dermascreen_messages");
     return saved ? JSON.parse(saved) : initialMessages;
   });
   const [currentScan, setCurrentScan] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+
+  // Sync scans to localStorage whenever scans state changes
+  useEffect(() => {
+    if (scans.length > 0) {
+      localStorage.setItem("dermascreen_scans", JSON.stringify(scans));
+    }
+  }, [scans]);
 
   // ─────────────────── Firebase Auth Listener ───────────────────
   useEffect(() => {
@@ -52,7 +62,7 @@ export const AppProvider = ({ children }) => {
           try {
             const scanData = await getScans();
             if (scanData.scans && scanData.scans.length > 0) {
-              setScans(scanData.scans.map(s => ({
+              const backendScans = scanData.scans.map(s => ({
                 id: s.scan_id,
                 date: s.date || s.created_at,
                 created_at: s.created_at,
@@ -62,9 +72,16 @@ export const AppProvider = ({ children }) => {
                 status: s.status,
                 image: s.image_url,
                 notes: s.notes || "",
-              })));
-            } else {
-              setScans([]);
+              }));
+              
+              setScans(prev => {
+                // Merge backend scans with any locally cached scans avoiding duplicates
+                const existingIds = new Set(backendScans.map(b => b.id));
+                const localOnly = prev.filter(p => !existingIds.has(p.id));
+                const combined = [...backendScans, ...localOnly];
+                localStorage.setItem("dermascreen_scans", JSON.stringify(combined));
+                return combined;
+              });
             }
           } catch (err) {
             console.warn("Could not load scans from backend:", err.message);
@@ -103,7 +120,6 @@ export const AppProvider = ({ children }) => {
           isLoggedIn: false,
           firebaseUser: null,
         });
-        setScans([]);
       }
       setAuthLoading(false);
     });
