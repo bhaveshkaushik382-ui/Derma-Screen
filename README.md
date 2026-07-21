@@ -1,9 +1,9 @@
 # 🩺 DermaScreen
 
-[![React](https://img.shields.999.io/badge/React-19-blue.svg?style=flat&logo=react)](https://react.dev/)
-[![FastAPI](https://img.shields.999.io/badge/FastAPI-0.115.0-green.svg?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![Tailwind CSS](https://img.shields.999.io/badge/Tailwind_CSS-4.0-38bdf8.svg?style=flat&logo=tailwindcss)](https://tailwindcss.com/)
-[![PyTorch](https://img.shields.999.io/badge/PyTorch-2.0+-ee4c2c.svg?style=flat&logo=pytorch)](https://pytorch.org/)
+[![React](https://img.shields.io/badge/React-19-blue.svg?style=flat&logo=react)](https://react.dev/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115.0-green.svg?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38bdf8.svg?style=flat&logo=tailwindcss)](https://tailwindcss.com/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg?style=flat&logo=pytorch)](https://pytorch.org/)
 
 **DermaScreen** is a state-of-the-art, AI-powered clinical dermatology screening application. It provides users with an accessible tool to analyze skin lesions using machine learning, check image quality to ensure accurate scans, visualize diagnosis insights using Grad-CAM heatmaps, and consult with a virtual AI health assistant.
 
@@ -27,6 +27,7 @@
 *   **Routing**: React Router DOM v7
 *   **Styling**: Tailwind CSS v4 (with PostCSS and Autoprefixer)
 *   **Authentication & Services**: Firebase Client SDK
+*   **Deployment**: Vercel
 
 ### Backend
 *   **Framework**: FastAPI (Python 3.10+)
@@ -36,6 +37,7 @@
 *   **Database & File Storage**: Supabase SDK
 *   **LLM API**: OpenRouter Client (Gemini 2.0)
 *   **Auth Verification**: Firebase Admin SDK
+*   **Deployment**: Render
 
 ---
 
@@ -43,36 +45,81 @@
 
 ```text
 DermaScreen/
-├── backend/
+├── frontend/                        # React + Vite frontend (deploy to Vercel)
+│   ├── src/
+│   │   ├── components/              # Reusable UI components (Layout, etc.)
+│   │   ├── context/                 # App State Context (AppContext.jsx)
+│   │   ├── pages/                   # Application Views (Dashboard, Scan, Chat, etc.)
+│   │   ├── services/
+│   │   │   ├── api.js               # API client (connects to backend)
+│   │   │   ├── firebase.js          # Firebase client setup & auth helpers
+│   │   │   └── report.js            # PDF report generation
+│   │   ├── App.jsx                  # Route definitions
+│   │   └── main.jsx                 # React entrypoint
+│   ├── public/                      # Static assets (favicon, icons)
+│   ├── .env.example                 # Template for frontend env variables
+│   ├── package.json                 # Node dependencies & scripts
+│   ├── vite.config.js               # Vite bundler configuration
+│   └── index.html                   # HTML entry point
+│
+├── backend/                         # FastAPI backend (deploy to Render)
 │   ├── app/
-│   │   ├── main.py                 # FastAPI application entry point
-│   │   ├── config.py               # Settings & Environment configuration
-│   │   ├── dependencies.py         # Auth & Database dependencies
-│   │   ├── routers/                # API Endpoints (auth, scans, quality, predict, etc.)
-│   │   ├── schemas/                # Pydantic data schemas
-│   │   └── services/               # Services (ML, Firebase Admin, Quality checks)
-│   ├── models/
-│   │   └── grad_cam.pkl            # Trained PyTorch Model file (needs Git LFS)
-│   ├── .env.example                # Template for backend secrets
-│   └── requirements.txt            # Python dependencies
-├── src/
-│   ├── components/                 # Reusable UI components
-│   ├── context/                    # App State Context (AppContext.jsx)
-│   ├── pages/                      # Application Views (Dashboard, History, Scan, Chat, etc.)
-│   ├── services/
-│   │   └── firebase.js             # Firebase client setup & auth helpers
-│   ├── App.jsx                     # Route definitions
-│   └── main.jsx                    # React entrypoint
-├── package.json                    # Node dependencies & frontend scripts
-├── vite.config.js                  # Vite bundler configuration
-└── README.md                       # Documentation
+│   │   ├── main.py                  # FastAPI application entry point
+│   │   ├── config.py                # Settings & Environment configuration
+│   │   ├── dependencies.py          # Auth & Database dependencies
+│   │   ├── routers/                 # API Endpoints (auth, scans, quality, predict, etc.)
+│   │   ├── schemas/                 # Pydantic data schemas
+│   │   └── services/                # Services (ML, Firebase Admin, Quality checks)
+│   ├── models/                      # Trained ML model files
+│   ├── .env.example                 # Template for backend secrets
+│   └── requirements.txt             # Python dependencies
+│
+├── README.md                        # Documentation
+├── ARCHITECTURE.md                  # Detailed architecture documentation
+└── architecture.txt                 # Architecture notes
 ```
 
 ---
 
-## 🚀 Installation & Local Setup
+## 🚀 Deployment
 
-Follow these steps to set up both the frontend and backend on your local machine.
+### Deploy Backend on Render
+
+1.  Push this repo to GitHub.
+2.  Create a **Web Service** on [Render](https://render.com/) with **Python** runtime.
+3.  Configure the following:
+
+    | Setting | Value |
+    |---|---|
+    | **Root Directory** | `backend` |
+    | **Build Command** | `pip install -r requirements.txt` |
+    | **Start Command** | `uvicorn app.main:app --host 0.0.0.0 --port $PORT` |
+
+4.  Add all environment variables from `backend/.env.example` in Render's **Environment** tab.
+
+### Deploy Frontend on Vercel
+
+1.  Create a new project on [Vercel](https://vercel.com/) and import this repo.
+2.  Configure the following:
+
+    | Setting | Value |
+    |---|---|
+    | **Root Directory** | `frontend` |
+    | **Framework Preset** | `Vite` |
+    | **Build Command** | `npm run build` |
+    | **Output Directory** | `dist` |
+
+3.  Add this environment variable on Vercel:
+
+    | Key | Value |
+    |---|---|
+    | `VITE_API_BASE_URL` | `https://your-render-app.onrender.com/api/v1` |
+
+4.  Update Render's `FRONTEND_URL` env variable to your Vercel URL (for CORS).
+
+---
+
+## 💻 Local Development Setup
 
 ### 📋 Prerequisites
 *   [Node.js](https://nodejs.org/) (v18 or higher recommended)
@@ -121,22 +168,22 @@ Follow these steps to set up both the frontend and backend on your local machine
     *   Place this file inside the `backend/` directory and configure the filename in your `.env` file under `FIREBASE_SERVICE_ACCOUNT_PATH`.
 
 6.  **Place the Machine Learning Model:**
-    *   Ensure your PyTorch `.pkl` model file is located at `backend/models/grad_cam.pkl` (or matching the `ML_MODEL_PATH` setting in your `.env`).
+    *   Ensure your PyTorch model file is located at `backend/models/` (matching the `ML_MODEL_PATH` setting in your `.env`).
 
 7.  **Start the Uvicorn Dev Server:**
     ```bash
     uvicorn app.main:app --reload --port 8000
     ```
-    *   The API documentation will be available at: [http://localhost:8000/docs](http://localhost:8000/docs)
-    *   The backend health endpoint is: [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health)
+    *   API docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+    *   Health check: [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health)
 
 ---
 
 ### 2. Frontend Setup (React + Vite)
 
-1.  **Navigate to the root directory:**
+1.  **Navigate to the frontend directory:**
     ```bash
-    cd ..
+    cd frontend
     ```
 
 2.  **Install the Node modules:**
@@ -144,30 +191,29 @@ Follow these steps to set up both the frontend and backend on your local machine
     npm install
     ```
 
-3.  **Configure Firebase Frontend SDK:**
-    *   Ensure your Firebase Web App configuration credentials are correct in [src/services/firebase.js](file:///c:/Users/Bhavesh%20Kaushik/Desktop/DermaScreen/src/services/firebase.js).
-    *   *Tip: In production, these should be moved to environment variables prefixed with `VITE_`.*
-
-4.  **Start the frontend development server:**
+3.  **Start the frontend development server:**
     ```bash
     npm run dev
     ```
     *   Open your browser to: [http://localhost:5173](http://localhost:5173)
 
+> **Note:** By default, the frontend connects to `http://localhost:8000/api/v1`. To change this, create a `.env` file in the `frontend/` directory and set `VITE_API_BASE_URL` to your backend URL.
+
 ---
 
 ## ⚠️ Important Note on Large Files (Git LFS)
 
-The model file `backend/models/grad_cam.pkl` is approximately ~92MB, which exceeds GitHub's standard warning limit (50MB) and is close to the hard block limit (100MB). 
+The model files in `backend/models/` may exceed GitHub's standard file size limit (50MB).
 
 To avoid push failures:
 1.  Install **Git LFS** on your machine:
     ```bash
     git lfs install
     ```
-2.  Track the `.pkl` file extension:
+2.  Track the model file extensions:
     ```bash
     git lfs track "*.pkl"
+    git lfs track "*.pth"
     git add .gitattributes
     ```
 3.  Commit and push your files normally.
