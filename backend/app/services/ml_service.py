@@ -261,6 +261,13 @@ def predict(image_bytes: bytes, abcde_answers: dict = None) -> dict:
     Run the ML model on an image and return classification results.
     Returns: { condition, confidence, risk, notes, grad_cam_image }
     """
+    global _model_loaded
+
+    # Lazy load: load model on first prediction request
+    if not _model_loaded and _model is None:
+        print("[ML] Lazy loading model on first prediction request...")
+        load_model()
+
     if not _model_loaded or _model is None:
         return _fallback_predict(abcde_answers)
 

@@ -26,8 +26,9 @@ async def lifespan(app: FastAPI):
     # Load image quality config
     quality_service.load_quality_config()
 
-    # Load ML model
-    ml_service.load_model()
+    # Load ML model lazily (on first prediction request) to save memory on startup
+    # ml_service.load_model()  — now loaded on-demand in ml_service.predict()
+    print("  ML model will load on first prediction request (lazy loading)")
 
     print("=" * 50)
     print(f"CORS allowed origin: {settings.FRONTEND_URL}")
