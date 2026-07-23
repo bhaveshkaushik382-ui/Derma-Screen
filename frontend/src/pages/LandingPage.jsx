@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import ThemeSelector from '../components/ThemeSelector';
 
 export default function LandingPage() {
   const elementsRef = useRef([]);
@@ -46,18 +47,24 @@ export default function LandingPage() {
           <span className="material-symbols-outlined text-primary font-bold text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>medical_services</span>
           <span className="font-headline-md text-headline-md font-bold text-primary">DermaScreen</span>
         </div>
-        <nav className="hidden md:flex items-center gap-8">
-          <a className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#features">Features</a>
-          <a className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#how-it-works">How it Works</a>
-          <a className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#faq">FAQ</a>
-          <Link className="px-5 py-2.5 bg-primary text-white rounded-full font-label-md text-label-md hover:bg-primary-container transition-all active:scale-95" to="/auth">Sign In</Link>
-        </nav>
-        <Link to="/auth" className="md:hidden text-primary p-2">
-          <span className="material-symbols-outlined">menu</span>
-        </Link>
+
+        <div className="flex items-center gap-4">
+          <nav className="hidden md:flex items-center gap-6">
+            <a className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#features">Features</a>
+            <a className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#how-it-works">How it Works</a>
+            <a className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#faq">FAQ</a>
+          </nav>
+
+          <ThemeSelector align="right" />
+
+          <Link className="px-5 py-2 bg-primary text-white rounded-full font-label-md text-label-md hover:bg-primary-container transition-all active:scale-95 shadow-md shadow-primary/20" to="/auth">
+            Sign In
+          </Link>
+        </div>
       </header>
 
       <main className="pt-16">
+
         {/* Hero Section */}
         <section className="relative min-h-[80vh] lg:min-h-[90vh] flex items-center overflow-hidden px-margin-mobile md:px-margin-desktop py-20">
           <div className="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">

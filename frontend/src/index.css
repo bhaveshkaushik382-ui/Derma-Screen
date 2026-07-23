@@ -149,7 +149,9 @@
   100% { opacity: .2; transform: scale(0.8); }
 }
 
-/* Dark/Black Theme Overrides */
+/* Multi-Theme System Definitions */
+
+/* 1. Dark / Black Theme Overrides */
 html.dark {
   --color-surface: #0a0e17;
   --color-surface-container-lowest: #0d131f;
@@ -177,49 +179,134 @@ html.dark body {
   color: #e6edf7;
 }
 
-/* Specific elements to handle white backgrounds in dark mode */
-html.dark .bg-white {
-  background-color: #0d131f !important;
+/* 2. Ocean Cyan Theme Overrides */
+html.ocean {
+  --color-primary: #00a896;
+  --color-primary-container: #028090;
+  --color-primary-fixed: #02c39a;
+  --color-primary-fixed-dim: #00a896;
+  --color-secondary: #05668d;
+  --color-secondary-container: #0c2d45;
+  --color-on-secondary-container: #8cb8c7;
+  --color-surface: #061826;
+  --color-surface-container-lowest: #092032;
+  --color-surface-container-low: #0f2d45;
+  --color-surface-container: #143a57;
+  --color-surface-container-high: #1a476b;
+  --color-surface-container-highest: #225782;
+  --color-background: #061826;
+  --color-on-background: #e0f4f7;
+  --color-on-surface: #e0f4f7;
+  --color-on-surface-variant: #8cb8c7;
+  --color-outline: #4d8296;
+  --color-outline-variant: #1c435e;
+  --color-surface-bright: #0f2d45;
+  --color-surface-dim: #04101b;
+  --color-inverse-surface: #f0fdfa;
+  --color-inverse-on-surface: #061826;
+
+  background-color: #061826;
+  color: #e0f4f7;
 }
 
-html.dark .bg-white\/90 {
-  background-color: rgba(13, 19, 31, 0.9) !important;
+html.ocean body {
+  background-color: #061826;
+  color: #e0f4f7;
 }
 
-html.dark .text-on-surface {
-  color: #e6edf7 !important;
+/* 3. Neon Cyber Theme Overrides */
+html.cyber {
+  --color-primary: #a855f7;
+  --color-primary-container: #7e22ce;
+  --color-primary-fixed: #c084fc;
+  --color-primary-fixed-dim: #a855f7;
+  --color-secondary: #06b6d4;
+  --color-secondary-container: #1c1130;
+  --color-on-secondary-container: #c4a9df;
+  --color-surface: #0f0919;
+  --color-surface-container-lowest: #140c22;
+  --color-surface-container-low: #1c1130;
+  --color-surface-container: #261642;
+  --color-surface-container-high: #331e58;
+  --color-surface-container-highest: #432773;
+  --color-background: #0f0919;
+  --color-on-background: #f5e6ff;
+  --color-on-surface: #f5e6ff;
+  --color-on-surface-variant: #c4a9df;
+  --color-outline: #825cb3;
+  --color-outline-variant: #341e59;
+  --color-surface-bright: #1c1130;
+  --color-surface-dim: #090510;
+  --color-inverse-surface: #faf5ff;
+  --color-inverse-on-surface: #0f0919;
+
+  background-color: #0f0919;
+  color: #f5e6ff;
 }
 
-html.dark .text-on-surface-variant {
-  color: #a2b0c3 !important;
+html.cyber body {
+  background-color: #0f0919;
+  color: #f5e6ff;
+}
+
+/* Specific elements to handle white backgrounds and borders across dark modes */
+html.dark .bg-white, html.ocean .bg-white, html.cyber .bg-white {
+  background-color: var(--color-surface-container-lowest) !important;
+}
+
+html.dark .bg-white\/90, html.ocean .bg-white\/90, html.cyber .bg-white\/90 {
+  background-color: var(--color-surface-container-lowest) !important;
+}
+
+html.dark .text-on-surface, html.ocean .text-on-surface, html.cyber .text-on-surface {
+  color: var(--color-on-surface) !important;
+}
+
+html.dark .text-on-surface-variant, html.ocean .text-on-surface-variant, html.cyber .text-on-surface-variant {
+  color: var(--color-on-surface-variant) !important;
 }
 
 html.dark .glass-card {
-  background: rgba(13, 19, 31, 0.7);
+  background: rgba(13, 19, 31, 0.75);
   border-color: rgba(40, 53, 72, 0.5) !important;
 }
 
-html.dark .border-outline-variant {
-  border-color: #283548 !important;
+html.ocean .glass-card {
+  background: rgba(9, 32, 50, 0.75);
+  border-color: rgba(28, 67, 94, 0.5) !important;
 }
 
-html.dark .border-outline-variant\/30 {
-  border-color: rgba(40, 53, 72, 0.3) !important;
+html.cyber .glass-card {
+  background: rgba(20, 12, 34, 0.75);
+  border-color: rgba(52, 30, 89, 0.5) !important;
 }
 
-html.dark .hover\:bg-surface-container-low:hover {
-  background-color: #151d2d !important;
+html.dark .border-outline-variant, html.ocean .border-outline-variant, html.cyber .border-outline-variant {
+  border-color: var(--color-outline-variant) !important;
 }
 
-html.dark .hover\:bg-surface:hover {
-  background-color: #0a0e17 !important;
+html.dark .border-outline-variant\/30, html.ocean .border-outline-variant\/30, html.cyber .border-outline-variant\/30 {
+  border-color: var(--color-outline-variant) !important;
 }
 
-html.dark input::placeholder {
-  color: #5c6b80 !important;
+html.dark .hover\:bg-surface-container-low:hover, 
+html.ocean .hover\:bg-surface-container-low:hover, 
+html.cyber .hover\:bg-surface-container-low:hover {
+  background-color: var(--color-surface-container-low) !important;
 }
 
-html.dark input {
-  color: #e6edf7 !important;
-  background-color: #0d131f !important;
+html.dark .hover\:bg-surface:hover,
+html.ocean .hover\:bg-surface:hover,
+html.cyber .hover\:bg-surface:hover {
+  background-color: var(--color-surface) !important;
 }
+
+html.dark input::placeholder, html.ocean input::placeholder, html.cyber input::placeholder {
+  color: var(--color-outline) !important;
+}
+
+html.dark input, html.ocean input, html.cyber input {
+  color: var(--color-on-surface) !important;
+  background-color: var(--color-surface-container-lowest) !important;
+}
+

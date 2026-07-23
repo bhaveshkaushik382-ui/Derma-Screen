@@ -1,27 +1,13 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
+import ThemeSelector from './ThemeSelector';
 
 export default function Layout({ children }) {
   const { user, logout } = useContext(AppContext);
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
-
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
 
   const isPublicPage = location.pathname === '/' || location.pathname === '/auth';
 
@@ -50,10 +36,12 @@ export default function Layout({ children }) {
             <span className="material-symbols-outlined text-primary font-bold text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>medical_services</span>
             <span className="font-headline-md text-headline-md font-bold text-primary">DermaScreen</span>
           </Link>
-
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          {/* Theme Selector Dropdown in Navbar */}
+          <ThemeSelector align="right" />
+
           <button className="p-2 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-full relative">
             <span className="material-symbols-outlined">notifications</span>
             <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
@@ -61,7 +49,7 @@ export default function Layout({ children }) {
           <Link to="/assistant" className="p-2 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-full">
             <span className="material-symbols-outlined">help</span>
           </Link>
-          <div className="h-8 w-[1px] bg-outline-variant mx-2"></div>
+          <div className="h-8 w-[1px] bg-outline-variant mx-1"></div>
           <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
             <div className="text-right hidden sm:block">
               <p className="font-label-md text-on-surface text-sm font-semibold">{user.name || 'Dr. Sarah Mitchell'}</p>
@@ -103,18 +91,11 @@ export default function Layout({ children }) {
             );
           })}
         </div>
-        <div className="mt-auto pt-4 border-t border-outline-variant space-y-1">
-          <button 
-            onClick={toggleTheme}
-            className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all rounded-xl w-full text-left cursor-pointer"
-          >
-            <span className="material-symbols-outlined">
-              {theme === 'light' ? 'dark_mode' : 'light_mode'}
-            </span>
-            <span className="font-label-md">
-              {theme === 'light' ? 'Dark Theme' : 'Light Theme'}
-            </span>
-          </button>
+        <div className="mt-auto pt-4 border-t border-outline-variant space-y-3">
+          <div className="px-2">
+            <p className="text-xs font-semibold text-on-surface-variant mb-1.5 px-2">Appearance</p>
+            <ThemeSelector align="left" />
+          </div>
           <button 
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-3 text-error hover:bg-error-container/20 transition-all rounded-xl w-full text-left cursor-pointer"
@@ -153,21 +134,11 @@ export default function Layout({ children }) {
                 );
               })}
             </div>
-            <div className="mt-auto pt-4 border-t border-outline-variant space-y-1">
-              <button 
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  toggleTheme();
-                }}
-                className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container hover:text-primary transition-all rounded-xl w-full text-left cursor-pointer"
-              >
-                <span className="material-symbols-outlined">
-                  {theme === 'light' ? 'dark_mode' : 'light_mode'}
-                </span>
-                <span className="font-label-md">
-                  {theme === 'light' ? 'Dark Theme' : 'Light Theme'}
-                </span>
-              </button>
+            <div className="mt-auto pt-4 border-t border-outline-variant space-y-3">
+              <div className="px-2">
+                <p className="text-xs font-semibold text-on-surface-variant mb-1.5 px-2">Appearance</p>
+                <ThemeSelector align="left" />
+              </div>
               <button 
                 onClick={() => {
                   setMobileMenuOpen(false);
@@ -182,6 +153,7 @@ export default function Layout({ children }) {
           </aside>
         </>
       )}
+
 
       {/* Main Content Area */}
       <main className="lg:ml-64 pt-24 pb-20 px-4 md:px-margin-desktop min-h-screen">

@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import { loginWithEmail, signupWithEmail, loginWithGoogle, sendResetPasswordEmail } from '../services/firebase';
+import ThemeSelector from '../components/ThemeSelector';
 
 export default function Auth() {
   const { login } = useContext(AppContext);
@@ -86,11 +87,17 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 md:p-8 overflow-x-hidden relative">
+      {/* Absolute Header with Theme Selector */}
+      <div className="absolute top-4 right-4 z-50">
+        <ThemeSelector align="right" />
+      </div>
+
       {/* Background Elements */}
       <div className="fixed top-0 left-0 w-full h-full -z-10 bg-surface">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-container/10 rounded-full blur-[100px] animate-pulse"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary-container/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '2s' }}></div>
       </div>
+
 
       {/* Split Layout Container */}
       <main className="w-full max-w-[1280px] min-h-[700px] flex overflow-hidden rounded-3xl bg-white shadow-xl">
