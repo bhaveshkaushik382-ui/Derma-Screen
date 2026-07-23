@@ -94,7 +94,7 @@ export default function Layout({ children }) {
         <div className="mt-auto pt-4 border-t border-outline-variant space-y-3">
           <div className="px-2">
             <p className="text-xs font-semibold text-on-surface-variant mb-1.5 px-2">Appearance</p>
-            <ThemeSelector align="left" fullWidth={true} />
+            <ThemeSelector align="left" fullWidth={true} direction="up" />
           </div>
           <button 
             onClick={handleLogout}
@@ -137,7 +137,7 @@ export default function Layout({ children }) {
             <div className="mt-auto pt-4 border-t border-outline-variant space-y-3">
               <div className="px-2">
                 <p className="text-xs font-semibold text-on-surface-variant mb-1.5 px-2">Appearance</p>
-                <ThemeSelector align="left" fullWidth={true} />
+                <ThemeSelector align="left" fullWidth={true} direction="up" />
               </div>
               <button 
                 onClick={() => {

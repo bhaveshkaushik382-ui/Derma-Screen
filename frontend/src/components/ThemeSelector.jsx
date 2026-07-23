@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 
-export default function ThemeSelector({ align = 'right', compact = false, fullWidth = false }) {
+export default function ThemeSelector({ align = 'right', compact = false, fullWidth = false, direction = 'down' }) {
   const { theme, setTheme, THEMES, currentThemeObj } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -45,14 +45,14 @@ export default function ThemeSelector({ align = 'right', compact = false, fullWi
         </span>
       </button>
 
-
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className={`absolute z-50 mt-2 w-56 rounded-2xl bg-surface/95 backdrop-blur-xl border border-outline-variant shadow-2xl p-1.5 space-y-1 animate-in fade-in zoom-in-95 duration-150 ${
-            align === 'left' ? 'left-0' : 'right-0'
-          }`}
+          className={`absolute z-50 w-60 rounded-2xl bg-surface/95 backdrop-blur-xl border border-outline-variant shadow-2xl p-1.5 space-y-1 animate-in fade-in zoom-in-95 duration-150 ${
+            direction === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'
+          } ${align === 'left' ? 'left-0' : 'right-0'}`}
         >
+
           <div className="px-3 py-2 text-xs font-semibold text-on-surface-variant/80 border-b border-outline-variant/40 flex items-center justify-between">
             <span>Select Theme</span>
             <span className="material-symbols-outlined text-[14px]">palette</span>
