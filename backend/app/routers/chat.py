@@ -56,24 +56,39 @@ async def chat(request: ChatRequest, user: dict = Depends(get_current_user)):
 
     # Fetch latest scans to ground the assistant with user context
     scan_context = ""
+    latest_scans = []
     try:
         latest_scans = supabase_service.get_user_scans(user["id"], limit=5)
         if latest_scans:
             latest_scan = latest_scans[0]
-            scan_context = "\nBelow is context about the user's LATEST skin scan on file:\n"
+            scan_context = "\n--- USER'S SCAN DATA (use this to answer scan-related questions) ---\n"
+            scan_context += "LATEST SCAN DETAILS:\n"
+            scan_context += f"  • Scan Date: {latest_scan.get('created_at', 'N/A')}\n"
+            scan_context += f"  • Identified Condition: {latest_scan.get('condition', 'N/A')}\n"
+            scan_context += f"  • AI Confidence Score: {latest_scan.get('confidence', 'N/A')}%\n"
+            scan_context += f"  • Risk Assessment: {latest_scan.get('risk', 'N/A')}\n"
+            scan_context += f"  • Scan Status: {latest_scan.get('status', 'N/A')}\n"
+            scan_context += f"  • Clinical Notes / ABCDE Assessment: {latest_scan.get('notes', 'None recorded')}\n"
             scan_context += (
-                f"- LATEST SCAN DETAILS: Date={latest_scan.get('created_at')}, "
-                f"Condition={latest_scan.get('condition')}, "
-                f"Confidence={latest_scan.get('confidence')}%, "
-                f"Risk={latest_scan.get('risk')}, "
-                f"Clinical Notes={latest_scan.get('notes')}\n"
+                "\nINSTRUCTIONS: When the user asks about their latest scan, report, or results, "
+                "use the LATEST SCAN DETAILS above to:\n"
+                "1. Explain what the identified condition IS (in simple patient-friendly terms)\n"
+                "2. Explain what the confidence score and risk level MEAN\n"
+                "3. Whether the condition is treatable and HOW (specific OTC medicines, creams, home remedies)\n"
+                "4. What the recommended next steps are\n"
+                "Do NOT say 'I cannot see the image'. Use the scan data to provide a thorough expert analysis.\n"
             )
-            scan_context += "If the user asks about their latest scan, evaluate these LATEST SCAN DETAILS, explain the clinical condition/skin problem, explain whether it is treatable/solvable, and suggest appropriate OTC treatments or remedies based on your expert prompt instructions. Do not just state the confidence score.\n"
-            
+
             if len(latest_scans) > 1:
-                scan_context += "\nFor historical reference, here are older scans:\n"
+                scan_context += "\nOlder scans for historical reference:\n"
                 for idx, scan in enumerate(latest_scans[1:], 2):
-                    scan_context += f"- Scan {idx} (Older): Date={scan.get('created_at')}, Condition={scan.get('condition')}, Confidence={scan.get('confidence')}%, Risk={scan.get('risk')}\n"
+                    scan_context += (
+                        f"  • Scan {idx}: Date={scan.get('created_at')}, "
+                        f"Condition={scan.get('condition')}, "
+                        f"Confidence={scan.get('confidence')}%, "
+                        f"Risk={scan.get('risk')}\n"
+                    )
+            scan_context += "--- END OF SCAN DATA ---\n"
     except Exception as e:
         print(f"[WARN] Failed to fetch user scans for chat context: {e}")
 
@@ -101,7 +116,7 @@ async def chat(request: ChatRequest, user: dict = Depends(get_current_user)):
     # Use user's manually attached image first; otherwise fall back to latest scan's image URL
     fallback_image = None
     if not request.image_url and latest_scans:
-        fallback_image = latest_scan.get('image_url')
+        fallback_image = latest_scans[0].get('image_url')
 
     response_text = await chat_service.get_chat_response(
         message=request.message,
