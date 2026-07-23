@@ -79,6 +79,8 @@ async def list_scans(user: dict = Depends(get_current_user)):
             except Exception:
                 q_score = None
 
+        grad_cam_img = s.get("grad_cam_image") or (q_score.get("grad_cam_image") if isinstance(q_score, dict) else None)
+
         scan_responses.append(ScanResponse(
             id=s.get("id"),
             scan_id=s.get("scan_id", ""),
@@ -89,6 +91,7 @@ async def list_scans(user: dict = Depends(get_current_user)):
             status=s.get("status", "Completed"),
             notes=s.get("notes", ""),
             quality_score=q_score,
+            grad_cam_image=grad_cam_img,
             created_at=date_str,
             date=formatted_date,
         ))
@@ -120,6 +123,8 @@ async def get_scan(scan_id: str, user: dict = Depends(get_current_user)):
         except Exception:
             q_score = None
 
+    grad_cam_img = scan.get("grad_cam_image") or (q_score.get("grad_cam_image") if isinstance(q_score, dict) else None)
+
     return ScanResponse(
         id=scan.get("id"),
         scan_id=scan.get("scan_id", ""),
@@ -130,6 +135,7 @@ async def get_scan(scan_id: str, user: dict = Depends(get_current_user)):
         status=scan.get("status", "Completed"),
         notes=scan.get("notes", ""),
         quality_score=q_score,
+        grad_cam_image=grad_cam_img,
         created_at=date_str,
         date=formatted_date,
     )

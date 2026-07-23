@@ -64,19 +64,40 @@ async def predict_lesion(
     prediction = ml_service.predict(file_bytes, abcde_answers=abcde_dict)
 
     # Extract GradCAM image before building the response
-    grad_cam_image = prediction.get("grad_cam_image")
+    grad_cam_raw = prediction.get("grad_cam_image")
+    grad_cam_url = None
+
+    if grad_cam_raw:
+        if grad_cam_raw.startswith("data:image"):
+            # Upload GradCAM heatmap PNG to Supabase Storage for permanent storage
+            try:
+                import base64
+                header, encoded = grad_cam_raw.split(",", 1)
+                g_bytes = base64.b64decode(encoded)
+                grad_cam_url = supabase_service.upload_image(
+                    file_bytes=g_bytes,
+                    filename=f"gradcam_{uuid.uuid4().hex[:6]}.png",
+                    user_id=user["id"],
+                )
+            except Exception as e:
+                print(f"[WARN] Failed to upload GradCAM to storage: {e}")
+                grad_cam_url = grad_cam_raw
+        else:
+            grad_cam_url = grad_cam_raw
 
     # ──── Step 4: Save to Database ────
     scan_id = f"DS-{uuid.uuid4().hex[:4].upper()}"
     now = datetime.now(timezone.utc)
     formatted_date = now.strftime("%b %d, %Y")
 
-    # Build quality score JSON for storage
+    # Build quality score JSON for storage (include grad_cam_image inside quality_score JSON as backup)
     quality_score = {
         k: quality_result[k]
         for k in ["resolution", "blur", "lighting", "lesion"]
         if k in quality_result
     }
+    if grad_cam_url:
+        quality_score["grad_cam_image"] = grad_cam_url
 
     scan_record = {
         "id": str(uuid.uuid4()),
@@ -91,12 +112,20 @@ async def predict_lesion(
         "notes": prediction["notes"],
         "quality_score": json.dumps(quality_score),
     }
+    if grad_cam_url:
+        scan_record["grad_cam_image"] = grad_cam_url
 
     try:
         supabase_service.insert_scan(scan_record)
     except Exception as e:
-        print(f"  Failed to save scan to DB: {e}")
-        # Don't fail the request — still return the prediction
+        print(f"  Primary insert with grad_cam_image column failed: {e}. Retrying without top-level column...")
+        # Fallback if DB table lacks top-level grad_cam_image column
+        scan_record_fallback = dict(scan_record)
+        scan_record_fallback.pop("grad_cam_image", None)
+        try:
+            supabase_service.insert_scan(scan_record_fallback)
+        except Exception as e2:
+            print(f"  Failed to save scan to DB fallback: {e2}")
 
     # Append quality warning to notes if present
     notes = prediction["notes"]
@@ -113,5 +142,5 @@ async def predict_lesion(
         image_url=image_url,
         date=formatted_date,
         quality_warning=quality_warning,
-        grad_cam_image=grad_cam_image,
+        grad_cam_image=grad_cam_url or grad_cam_raw,
     )

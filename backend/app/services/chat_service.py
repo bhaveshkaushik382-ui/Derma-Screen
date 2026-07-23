@@ -7,7 +7,6 @@ Supports text, image, and PDF inputs with intelligent model routing.
 import io
 import base64
 import httpx
-from datetime import datetime
 from app.config import settings
 
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"

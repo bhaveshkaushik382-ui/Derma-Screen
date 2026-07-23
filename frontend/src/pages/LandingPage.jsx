@@ -289,7 +289,7 @@ export default function LandingPage() {
         {/* CTA Section */}
         <section className="py-24 px-margin-mobile md:px-margin-desktop">
           <div className="container mx-auto">
-            <div className="relative bg-on-background rounded-[48px] p-12 md:p-20 overflow-hidden text-center">
+            <div className="relative bg-slate-900 border border-slate-800 shadow-2xl rounded-[48px] p-12 md:p-20 overflow-hidden text-center">
               <div className="relative z-10">
                 <h2 className="font-headline-xl text-headline-xl text-white mb-6">Ready to take control of your skin health?</h2>
                 <p className="font-body-lg text-body-lg text-white/70 mb-10 max-w-2xl mx-auto">Join over 10,000 users who trust DermaScreen for their regular skin monitoring. Start your first scan today for free.</p>
@@ -297,7 +297,7 @@ export default function LandingPage() {
                   <Link to="/auth" className="px-10 py-5 bg-primary text-white rounded-xl font-label-md text-label-md font-bold hover:bg-primary-container transition-all shadow-xl shadow-primary/20">
                     Get Started Now
                   </Link>
-                  <Link to="/auth" className="px-10 py-5 bg-white/10 text-white rounded-xl font-label-md text-label-md font-bold hover:bg-white/20 backdrop-blur-md transition-all">
+                  <Link to="/auth" className="px-10 py-5 bg-white/10 text-white rounded-xl font-label-md text-label-md font-bold hover:bg-white/20 backdrop-blur-md border border-white/20 transition-all">
                     View Demo Scan
                   </Link>
                 </div>

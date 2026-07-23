@@ -136,71 +136,107 @@ export default function ScanHistory() {
             {filteredScans.map((scan) => {
               const isHighRisk = scan.risk === 'High' || scan.risk === 'Medium' || scan.risk === 'High Risk' || scan.risk === 'Moderate Risk' || scan.risk === 'Urgent Evaluation Recommended';
               return (
-                <div 
-                  key={scan.id} 
-                  className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-5 hover:shadow-md hover:border-primary transition-all group flex flex-col justify-between"
-                >
-                  <div className="flex flex-col sm:flex-row gap-5">
-                    <div className="w-full sm:w-32 h-32 rounded-xl overflow-hidden bg-surface-container shrink-0">
-                      <img className="w-full h-full object-cover" src={scan.image} alt={scan.condition} />
-                    </div>
-                    
-                    <div className="flex-grow space-y-2 text-left">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="font-headline-md text-base font-bold text-on-surface">{scan.condition}</h3>
-                          <p className="text-on-surface-variant text-xs">ID: {scan.id} • {scan.date}</p>
-                        </div>
-                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                          isHighRisk ? 'bg-error-container text-error' : 'bg-green-100 text-green-800'
-                        }`}>
-                          {scan.risk} Risk
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center gap-6 pt-2">
-                        <div>
-                          <p className="text-on-surface-variant text-[10px] uppercase font-semibold tracking-wider">Confidence</p>
-                          <p className="font-headline-md text-base text-primary font-bold">{scan.confidence}</p>
-                        </div>
-                        <div className="h-10 w-px bg-outline-variant"></div>
-                        <div>
-                          <p className="text-on-surface-variant text-[10px] uppercase font-semibold tracking-wider">Prediction</p>
-                          <p className="font-headline-md text-base text-on-surface font-bold">{isHighRisk ? 'Suspicious' : 'Benign'}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4 pt-4 border-t border-outline-variant flex justify-between items-center gap-3">
-                    <button 
-                      onClick={() => handleDelete(scan.id)}
-                      className="text-red-600 hover:bg-red-50 font-label-md px-3 py-2 rounded-lg transition-colors text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
-                      title="Delete Scan"
-                    >
-                      <span className="material-symbols-outlined text-[16px]">delete</span>
-                      Delete
-                    </button>
-                    <div className="flex gap-2">
-                      <button 
-                        onClick={() => handleDetails(scan)}
-                        className="text-on-surface-variant font-label-md px-4 py-2 hover:bg-surface-container rounded-lg transition-colors text-xs font-semibold cursor-pointer"
-                      >
-                        Details
-                      </button>
-                      <button 
-                        onClick={() => handleDownload(scan)}
-                        className="bg-secondary-container text-on-secondary-container font-label-md px-4 py-2 rounded-lg hover:brightness-95 transition-colors text-xs font-semibold cursor-pointer"
-                      >
-                        Generate Report
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <ScanCard 
+                  key={scan.id}
+                  scan={scan}
+                  isHighRisk={isHighRisk}
+                  onDelete={handleDelete}
+                  onDetails={handleDetails}
+                  onDownload={handleDownload}
+                />
               );
             })}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function ScanCard({ scan, isHighRisk, onDelete, onDetails, onDownload }) {
+  const [showGradCam, setShowGradCam] = useState(false);
+  const hasGradCam = Boolean(scan.grad_cam_image || scan.gradcam);
+  const gradCamSrc = scan.grad_cam_image || scan.gradcam;
+
+  return (
+    <div className="bg-surface-container-lowest border border-outline-variant rounded-2xl p-5 hover:shadow-md hover:border-primary transition-all group flex flex-col justify-between">
+      <div className="flex flex-col sm:flex-row gap-5">
+        <div className="w-full sm:w-32 h-32 rounded-xl overflow-hidden bg-surface-container shrink-0 relative">
+          <img 
+            className={`w-full h-full object-cover transition-opacity duration-300 ${showGradCam ? 'opacity-0' : 'opacity-100'}`} 
+            src={scan.image || scan.image_url} 
+            alt={scan.condition} 
+          />
+          {hasGradCam && (
+            <img 
+              className={`w-full h-full object-cover absolute inset-0 transition-opacity duration-300 ${showGradCam ? 'opacity-100' : 'opacity-0'}`} 
+              src={gradCamSrc} 
+              alt="GradCAM heatmap" 
+            />
+          )}
+
+          {hasGradCam && (
+            <button
+              onClick={() => setShowGradCam(!showGradCam)}
+              className="absolute bottom-1 right-1 bg-black/75 hover:bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-sm transition-all flex items-center gap-1 shadow cursor-pointer z-10"
+              title={showGradCam ? "Show original scan" : "Show GradCAM neural activation heatmap"}
+            >
+              <span className="material-symbols-outlined text-[12px]">local_fire_department</span>
+              {showGradCam ? "Original" : "GradCAM"}
+            </button>
+          )}
+        </div>
+        
+        <div className="flex-grow space-y-2 text-left">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="font-headline-md text-base font-bold text-on-surface">{scan.condition}</h3>
+              <p className="text-on-surface-variant text-xs">ID: {scan.id || scan.scan_id} • {scan.date}</p>
+            </div>
+            <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+              isHighRisk ? 'bg-error-container text-error' : 'bg-green-100 text-green-800'
+            }`}>
+              {scan.risk} Risk
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-6 pt-2">
+            <div>
+              <p className="text-on-surface-variant text-[10px] uppercase font-semibold tracking-wider">Confidence</p>
+              <p className="font-headline-md text-base text-primary font-bold">{scan.confidence}</p>
+            </div>
+            <div className="h-10 w-px bg-outline-variant"></div>
+            <div>
+              <p className="text-on-surface-variant text-[10px] uppercase font-semibold tracking-wider">Prediction</p>
+              <p className="font-headline-md text-base text-on-surface font-bold">{isHighRisk ? 'Suspicious' : 'Benign'}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="mt-4 pt-4 border-t border-outline-variant flex justify-between items-center gap-3">
+        <button 
+          onClick={() => onDelete(scan.id || scan.scan_id)}
+          className="text-red-600 hover:bg-red-50 font-label-md px-3 py-2 rounded-lg transition-colors text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+          title="Delete Scan"
+        >
+          <span className="material-symbols-outlined text-[16px]">delete</span>
+          Delete
+        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => onDetails(scan)}
+            className="text-on-surface-variant font-label-md px-4 py-2 hover:bg-surface-container rounded-lg transition-colors text-xs font-semibold cursor-pointer"
+          >
+            Details
+          </button>
+          <button 
+            onClick={() => onDownload(scan)}
+            className="bg-secondary-container text-on-secondary-container font-label-md px-4 py-2 rounded-lg hover:brightness-95 transition-colors text-xs font-semibold cursor-pointer"
+          >
+            Generate Report
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -83,6 +83,7 @@ export const AppProvider = ({ children }) => {
             if (scanData.scans && scanData.scans.length > 0) {
               const backendScans = scanData.scans.map(s => ({
                 id: s.scan_id,
+                scan_id: s.scan_id,
                 date: s.date || s.created_at,
                 created_at: s.created_at,
                 condition: s.condition,
@@ -90,7 +91,9 @@ export const AppProvider = ({ children }) => {
                 risk: s.risk,
                 status: s.status,
                 image: s.image_url,
+                image_url: s.image_url,
                 notes: s.notes || "",
+                grad_cam_image: s.grad_cam_image || "",
               }));
 
               // ★ REPLACE scans entirely with backend data (no merging stale local data)
@@ -172,14 +175,17 @@ export const AppProvider = ({ children }) => {
   const addScan = (scanData) => {
     const newScan = {
       id: scanData.scan_id || scanData.id || `DS-${Math.floor(1000 + Math.random() * 9000)}`,
+      scan_id: scanData.scan_id || scanData.id || `DS-${Math.floor(1000 + Math.random() * 9000)}`,
       date: scanData.date || new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
       created_at: scanData.created_at || new Date().toISOString(),
       condition: scanData.condition,
       confidence: scanData.confidence,
       risk: scanData.risk,
       image: scanData.image_url || scanData.image,
+      image_url: scanData.image_url || scanData.image,
       notes: scanData.notes || "",
       status: scanData.status || "Completed",
+      grad_cam_image: scanData.grad_cam_image || scanData.gradcam || "",
     };
     setScans(prev => [newScan, ...prev]);
     return newScan;

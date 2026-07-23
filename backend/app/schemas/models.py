@@ -51,6 +51,7 @@ class ScanResponse(BaseModel):
     status: str = "Completed"
     notes: Optional[str] = None
     quality_score: Optional[dict] = None
+    grad_cam_image: Optional[str] = None
     created_at: Optional[str] = None
     date: Optional[str] = None  # formatted date string for frontend
 
