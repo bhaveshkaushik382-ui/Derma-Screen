@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 
-export default function ThemeSelector({ align = 'right', compact = false }) {
+export default function ThemeSelector({ align = 'right', compact = false, fullWidth = false }) {
   const { theme, setTheme, THEMES, currentThemeObj } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -18,32 +18,33 @@ export default function ThemeSelector({ align = 'right', compact = false }) {
   }, []);
 
   return (
-    <div className="relative inline-block text-left" ref={dropdownRef}>
+    <div className={`relative ${fullWidth ? 'w-full' : 'inline-block'} text-left`} ref={dropdownRef}>
       {/* Selector Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center gap-2 px-3 py-2 rounded-xl border border-outline-variant/60 bg-surface/70 hover:bg-surface-container hover:border-primary/50 transition-all cursor-pointer text-on-surface shadow-sm ${
-          compact ? 'text-xs' : 'text-sm font-medium'
-        }`}
+        className={`flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-outline-variant/60 bg-surface/70 hover:bg-surface-container hover:border-primary/50 transition-all cursor-pointer text-on-surface shadow-sm ${
+          fullWidth ? 'w-full' : ''
+        } ${compact ? 'text-xs' : 'text-sm font-medium'}`}
         title="Change Theme"
         type="button"
       >
-        <span 
-          className="w-3 h-3 rounded-full shrink-0 shadow-sm transition-colors"
-          style={{ backgroundColor: currentThemeObj.color }}
-        />
-        <span className="material-symbols-outlined text-[18px] text-primary">
-          {currentThemeObj.icon}
-        </span>
-        {!compact && (
-          <span className="hidden sm:inline font-label-md">
-            {currentThemeObj.name.replace(' Theme', '')}
+        <div className="flex items-center gap-2">
+          <span 
+            className="w-3 h-3 rounded-full shrink-0 shadow-sm transition-colors"
+            style={{ backgroundColor: currentThemeObj.color }}
+          />
+          <span className="material-symbols-outlined text-[18px] text-primary">
+            {currentThemeObj.icon}
           </span>
-        )}
+          <span className="font-label-md">
+            {currentThemeObj.name}
+          </span>
+        </div>
         <span className="material-symbols-outlined text-[16px] text-on-surface-variant transition-transform duration-200" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
           expand_more
         </span>
       </button>
+
 
       {/* Dropdown Menu */}
       {isOpen && (
