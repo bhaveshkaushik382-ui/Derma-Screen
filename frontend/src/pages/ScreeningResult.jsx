@@ -223,7 +223,7 @@ export default function ScreeningResult() {
               </div>
               <div className="px-4 py-2 bg-surface-container-low rounded-lg border border-outline-variant text-left min-w-[100px]">
                 <p className="font-label-sm text-xs text-on-surface-variant">Classification</p>
-                <p className="font-headline-md text-lg font-bold text-on-surface">{scan.condition.split(' ')[0]}</p>
+                <p className="font-headline-md text-lg font-bold text-on-surface">{scan?.condition ? scan.condition.split(' ')[0] : 'Lesion'}</p>
               </div>
             </div>
             

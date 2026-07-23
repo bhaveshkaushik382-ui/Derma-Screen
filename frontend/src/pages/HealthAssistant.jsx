@@ -147,7 +147,7 @@ export default function HealthAssistant() {
           <div className="w-16 h-16 bg-primary-container text-white rounded-2xl flex items-center justify-center mb-4 shadow-md">
             <span className="material-symbols-outlined text-4xl">smart_toy</span>
           </div>
-          <h1 className="font-headline-md text-headline-md text-on-surface mb-2 font-bold">Hello, {user.name.split(' ')[0] || 'Dr. Sarah'}</h1>
+          <h1 className="font-headline-md text-headline-md text-on-surface mb-2 font-bold">Hello, {user?.name ? user.name.split(' ')[0] : (user?.email ? user.email.split('@')[0] : 'User')}</h1>
           <p className="font-body-md text-body-md text-on-surface-variant max-w-md text-sm">
             I'm your AI Clinical Assistant. How can I help you with your skin analysis today?
           </p>

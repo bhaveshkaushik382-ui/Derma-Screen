@@ -111,7 +111,7 @@ export default function Dashboard() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="font-headline-lg text-headline-lg text-on-background font-bold">Good morning, {user.name.split(' ')[0] || 'Dr. Mitchell'}</h1>
+          <h1 className="font-headline-lg text-headline-lg text-on-background font-bold">Good morning, {user?.name ? user.name.split(' ')[0] : (user?.email ? user.email.split('@')[0] : 'User')}</h1>
           <p className="text-body-md text-on-surface-variant mt-1">Here is the diagnostic summary for your clinical cases today.</p>
         </div>
         <Link 
