@@ -27,31 +27,22 @@ def get_client() -> Client:
 # ─────────────────── User Operations ───────────────────
 
 def upsert_user(firebase_uid: str, email: str, name: str = "", avatar_url: str = "") -> dict:
-    """Create or update a user record synced from Firebase."""
+    """Create or update a user record synced from Firebase (single-query upsert)."""
     client = get_client()
 
-    # Check if user already exists
-    result = client.table("users").select("*").eq("firebase_uid", firebase_uid).execute()
+    user_data = {
+        "firebase_uid": firebase_uid,
+        "email": email,
+        "name": name,
+        "avatar_url": avatar_url,
+    }
 
-    if result.data and len(result.data) > 0:
-        # Update existing user
-        updated = client.table("users").update({
-            "email": email,
-            "name": name,
-            "avatar_url": avatar_url,
-        }).eq("firebase_uid", firebase_uid).execute()
-        return updated.data[0] if updated.data else result.data[0]
-    else:
-        # Insert new user
-        new_user = {
-            "id": str(uuid.uuid4()),
-            "firebase_uid": firebase_uid,
-            "email": email,
-            "name": name,
-            "avatar_url": avatar_url,
-        }
-        inserted = client.table("users").insert(new_user).execute()
-        return inserted.data[0] if inserted.data else new_user
+    result = (
+        client.table("users")
+        .upsert(user_data, on_conflict="firebase_uid")
+        .execute()
+    )
+    return result.data[0] if result.data else user_data
 
 
 def get_user_by_firebase_uid(firebase_uid: str) -> dict | None:

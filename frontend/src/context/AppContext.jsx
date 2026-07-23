@@ -22,10 +22,8 @@ export const AppProvider = ({ children }) => {
     firebaseUser: null,
   });
 
-  const [scans, setScans] = useState(() => {
-    const saved = localStorage.getItem("dermascreen_scans");
-    return saved ? JSON.parse(saved) : [];
-  });
+  // ★ Start with empty scans — always load fresh from backend per-user
+  const [scans, setScans] = useState([]);
   const [messages, setMessages] = useState(() => {
     const saved = localStorage.getItem("dermascreen_messages");
     return saved ? JSON.parse(saved) : initialMessages;
@@ -44,23 +42,44 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthChange(async (firebaseUser) => {
       if (firebaseUser) {
+        // ★ Set user IMMEDIATELY from Firebase data — no waiting for backend
+        setUser({
+          name: firebaseUser.displayName || firebaseUser.email.split("@")[0],
+          email: firebaseUser.email,
+          avatar: firebaseUser.photoURL || "",
+          isLoggedIn: true,
+          firebaseUser: firebaseUser,
+        });
+        setAuthLoading(false);
+
+        // ★ Clear stale data from previous user before loading new user's data
+        setScans([]);
+        localStorage.removeItem("dermascreen_scans");
+
+        // ★ Run backend sync + data loading IN PARALLEL (not sequentially)
         try {
-          // Get ID token and verify with backend
           const idToken = await firebaseUser.getIdToken();
-          const backendUser = await verifyAuth(idToken);
 
-          setUser({
-            id: backendUser.id,
-            name: firebaseUser.displayName || backendUser.name || firebaseUser.email.split("@")[0],
-            email: firebaseUser.email,
-            avatar: firebaseUser.photoURL || backendUser.avatar_url || "",
-            isLoggedIn: true,
-            firebaseUser: firebaseUser,
-          });
+          const [authResult, scansResult, chatResult] = await Promise.allSettled([
+            verifyAuth(idToken),
+            getScans(),
+            getChatHistory(),
+          ]);
 
-          // Load scans from backend
-          try {
-            const scanData = await getScans();
+          // Enrich user with backend data if verify succeeded
+          if (authResult.status === "fulfilled") {
+            const backendUser = authResult.value;
+            setUser(prev => ({
+              ...prev,
+              id: backendUser.id,
+              name: firebaseUser.displayName || backendUser.name || prev.name,
+              avatar: firebaseUser.photoURL || backendUser.avatar_url || prev.avatar,
+            }));
+          }
+
+          // Load scans if fetch succeeded
+          if (scansResult.status === "fulfilled") {
+            const scanData = scansResult.value;
             if (scanData.scans && scanData.scans.length > 0) {
               const backendScans = scanData.scans.map(s => ({
                 id: s.scan_id,
@@ -73,23 +92,18 @@ export const AppProvider = ({ children }) => {
                 image: s.image_url,
                 notes: s.notes || "",
               }));
-              
-              setScans(prev => {
-                // Merge backend scans with any locally cached scans avoiding duplicates
-                const existingIds = new Set(backendScans.map(b => b.id));
-                const localOnly = prev.filter(p => !existingIds.has(p.id));
-                const combined = [...backendScans, ...localOnly];
-                localStorage.setItem("dermascreen_scans", JSON.stringify(combined));
-                return combined;
-              });
+
+              // ★ REPLACE scans entirely with backend data (no merging stale local data)
+              setScans(backendScans);
+              localStorage.setItem("dermascreen_scans", JSON.stringify(backendScans));
             }
-          } catch (err) {
-            console.warn("Could not load scans from backend:", err.message);
+          } else {
+            console.warn("Could not load scans:", scansResult.reason?.message);
           }
 
-          // Load chat history from backend
-          try {
-            const chatHistory = await getChatHistory();
+          // Load chat history if fetch succeeded
+          if (chatResult.status === "fulfilled") {
+            const chatHistory = chatResult.value;
             if (chatHistory && chatHistory.length > 0) {
               setMessages(chatHistory.map((m, idx) => ({
                 id: idx + 1,
@@ -98,19 +112,11 @@ export const AppProvider = ({ children }) => {
                 time: m.time || new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
               })));
             }
-          } catch (err) {
-            console.warn("Could not load chat history from backend:", err.message);
+          } else {
+            console.warn("Could not load chat history:", chatResult.reason?.message);
           }
         } catch (err) {
-          console.warn("Backend verification failed:", err.message);
-          // Still set user as logged in even if backend is down
-          setUser({
-            name: firebaseUser.displayName || firebaseUser.email.split("@")[0],
-            email: firebaseUser.email,
-            avatar: firebaseUser.photoURL || "",
-            isLoggedIn: true,
-            firebaseUser: firebaseUser,
-          });
+          console.warn("Backend sync error (user is still logged in):", err.message);
         }
       } else {
         setUser({
@@ -120,8 +126,8 @@ export const AppProvider = ({ children }) => {
           isLoggedIn: false,
           firebaseUser: null,
         });
+        setAuthLoading(false);
       }
-      setAuthLoading(false);
     });
 
     return () => unsubscribe();
@@ -158,6 +164,7 @@ export const AppProvider = ({ children }) => {
       firebaseUser: null,
     });
     setScans([]);
+    localStorage.removeItem("dermascreen_scans");
     localStorage.removeItem("dermascreen_messages");
     setMessages(initialMessages);
   };
