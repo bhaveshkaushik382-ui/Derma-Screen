@@ -106,9 +106,9 @@ export default function HealthAssistant() {
   };
 
   const suggestedQuestions = [
-    "Explain my latest scan report",
-    "Explain this report in simple terms",
-    "What does Suspicious mean?",
+    "Explain my latest scan report and suggest treatment",
+    "What skin condition was found and is it treatable?",
+    "What does Suspicious mean in my report?",
     "When should I see a dermatologist?",
   ];
 

@@ -1,8 +1,11 @@
 """
 DermaScreen — Chat Service
 Integrates with OpenRouter API for AI-powered dermatology assistant.
+Supports text, image, and PDF inputs with intelligent model routing.
 """
 
+import io
+import base64
 import httpx
 from datetime import datetime
 from app.config import settings
@@ -21,28 +24,30 @@ VISION_CAPABLE_MODELS = {
     "anthropic/claude-3.5-sonnet",
 }
 
-SYSTEM_PROMPT = """You are DermaScreen AI Assistant, a clinical dermatology and skin health expert chatbot.
+SYSTEM_PROMPT = """You are DermaScreen AI Assistant — an advanced clinical dermatology AI expert with deep knowledge of skin conditions, dermatopathology, treatments, and patient care.
 
-Your role:
-- Act as a knowledgeable health expert to explain skin conditions, symptoms, and scan reports in simple, patient-friendly terms.
-- When the user asks about their scan results, use the scan context data provided (condition, confidence, risk, clinical notes, ABCDE criteria) to give a thorough, specific analysis. Do NOT say "I can't see the image" — instead use the scan data provided in the context to explain the findings.
-- For any identified condition, clearly explain:
-  1. WHAT the condition is (name, description, what it looks like)
-  2. WHETHER it is treatable/solvable
-  3. HOW to treat it: suggest specific over-the-counter (OTC) medicines (topical creams, hydrocortisone, anti-fungal ointments, moisturizers, antihistamines, etc.), home remedies, and lifestyle/skincare recommendations
-  4. WHEN to see a doctor — explain warning signs that require professional attention
-- If the user asks "What does Suspicious mean?" — explain in clinical terms what a suspicious skin lesion finding means, the ABCDE criteria, what follow-up steps are recommended, and reassure the patient while being medically accurate.
-- If the user asks "When should I see a dermatologist?" — provide a comprehensive, expert answer listing all situations (new/changing moles, persistent rashes, suspicious findings, family history, annual screenings, etc.)
-- If the user asks about their report — analyze the scan context data, explain the condition found, its risk level, what the confidence score means, and provide actionable treatment recommendations.
-- If the user asks about skin problems, rashes, or infections (bacterial, viral, fungal), explain the typical symptoms, causes, and standard treatments or OTC solutions.
-- Provide general skincare, sun protection, and dermatological education.
+## Core Capabilities
+You are a highly trained medical AI with comprehensive knowledge of:
+- All skin conditions: cancers (melanoma, BCC, SCC), benign growths, infections, inflammatory conditions, autoimmune skin diseases
+- Dermatological diagnostics: dermoscopy, histopathology, ABCDE criteria, clinical staging
+- Treatment protocols: prescription medications, OTC remedies, surgical procedures, phototherapy, immunotherapy
+- General medicine related to skin: systemic diseases with skin manifestations, drug reactions, allergies
+- Skincare science: ingredients, routines, sun protection, anti-aging, wound care
+- Clinical report interpretation: pathology reports, lab results, imaging findings
 
-Important guidelines:
-- ALWAYS give a substantive, expert-level answer. Never refuse to answer or say you need more information if scan context is provided.
-- While you suggest OTC options, remedies, and general medical knowledge as an expert, always include a disclaimer recommending that they consult a board-certified dermatologist for a formal diagnosis and prescription.
-- Be empathetic, clear, and professional.
-- Keep responses informative and well-structured (use bullet points or numbered lists for treatments), 2-4 paragraphs.
-- Always remind users that DermaScreen is a screening support tool, not a replacement for a doctor.
+## How To Respond
+- **Be an expert**: Use your full medical knowledge to answer ANY question the user asks — whether about skin conditions, treatments, medications, skincare routines, symptoms, or their scan results. You are NOT limited to predefined topics.
+- **Be specific**: Name specific conditions, medicines, dosages, creams, and treatments. Don't give vague answers.
+- **Use scan data when available**: When the user asks about their scans/reports, analyze the scan context data provided. Explain the condition found, what it means, risk level, treatments, and next steps in detail.
+- **Read and analyze documents**: When the user uploads a PDF report or clinical document, the extracted text will be provided. Analyze it thoroughly — explain findings, flag abnormalities, interpret medical terminology, and give clear recommendations.
+- **Be comprehensive but clear**: Structure answers with headers, bullet points, or numbered lists. Keep language patient-friendly while being medically accurate.
+- **Give actionable advice**: Always provide concrete next steps — what to do, what to buy, what to watch for, when to see a doctor.
+
+## Guidelines
+- Always include a brief disclaimer that you're an AI assistant and recommend consulting a board-certified dermatologist for formal diagnosis.
+- Be empathetic and reassuring while being honest about serious findings.
+- If asked about topics outside dermatology/medicine, politely redirect to your area of expertise.
+- For ANY question about skin, health, medicine, or their reports — give a thorough, expert-quality answer.
 """
 
 
@@ -52,23 +57,80 @@ def _is_vision_capable() -> bool:
     return any(m in model for m in VISION_CAPABLE_MODELS)
 
 
+def _extract_pdf_text(base64_data: str) -> str:
+    """
+    Extract text from a base64-encoded PDF.
+    Tries PyPDF2 first, then pdfplumber as fallback.
+    Returns extracted text or empty string on failure.
+    """
+    try:
+        # Remove the data URL prefix if present
+        if "," in base64_data:
+            base64_data = base64_data.split(",", 1)[1]
+
+        pdf_bytes = base64.b64decode(base64_data)
+        pdf_file = io.BytesIO(pdf_bytes)
+
+        # Try PyPDF2 first
+        try:
+            import PyPDF2
+            reader = PyPDF2.PdfReader(pdf_file)
+            text_parts = []
+            for page in reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text_parts.append(page_text.strip())
+            if text_parts:
+                return "\n\n".join(text_parts)
+        except ImportError:
+            pass
+        except Exception as e:
+            print(f"[WARN] PyPDF2 extraction failed: {e}")
+
+        # Try pdfplumber as fallback
+        pdf_file.seek(0)
+        try:
+            import pdfplumber
+            with pdfplumber.open(pdf_file) as pdf:
+                text_parts = []
+                for page in pdf.pages:
+                    page_text = page.extract_text()
+                    if page_text:
+                        text_parts.append(page_text.strip())
+                if text_parts:
+                    return "\n\n".join(text_parts)
+        except ImportError:
+            pass
+        except Exception as e:
+            print(f"[WARN] pdfplumber extraction failed: {e}")
+
+        return ""
+    except Exception as e:
+        print(f"[ERROR] PDF extraction error: {e}")
+        return ""
+
+
 async def get_chat_response(message: str, history: list = None, context: str = None, image_url: str = None) -> str:
     """
     Send a message to OpenRouter and return the AI response.
+    Handles text, images (for vision models), and PDFs (text extraction).
 
     Args:
         message: The user's message
         history: Optional list of previous messages [{"sender": "user"|"assistant", "text": "..."}]
         context: Optional user scans context to ground the assistant
-        image_url: Optional base64 or public image URL
+        image_url: Optional base64 or public image URL (or PDF data URL)
 
     Returns:
         AI response text
     """
     if not settings.OPENROUTER_API_KEY or settings.OPENROUTER_API_KEY.startswith("#"):
-        return _fallback_response(message)
+        return (
+            "The AI assistant is not configured yet. Please set your OpenRouter API key "
+            "in the backend environment variables to enable AI-powered responses."
+        )
 
-    # Build messages array
+    # Build system prompt with context
     system_prompt = SYSTEM_PROMPT
     if context:
         system_prompt += f"\n{context}"
@@ -81,30 +143,60 @@ async def get_chat_response(message: str, history: list = None, context: str = N
             role = "user" if msg.get("sender") == "user" else "assistant"
             messages.append({"role": role, "content": msg.get("text", "")})
 
-    # Check if current model supports vision
+    # Check model capabilities
     vision_ok = _is_vision_capable()
 
-    # Add current message
-    if image_url and vision_ok:
-        # Model supports vision — send multimodal request
-        if image_url.startswith("data:application/pdf"):
-            pdf_note = "\n\n[System Note: The user has attached a clinical PDF report document. Explain to the user that while the application allows uploading PDF files, the AI vision model requires visual images (PNG/JPEG). Ask them to copy-paste the report text into the chat or upload a screenshot/image of it so you can analyze it for them.]"
-            messages.append({"role": "user", "content": message + pdf_note})
+    # ─── Handle different input types ───
+    if image_url and image_url.startswith("data:application/pdf"):
+        # PDF uploaded — extract text and include in message
+        pdf_text = _extract_pdf_text(image_url)
+        if pdf_text:
+            pdf_prompt = (
+                f"{message}\n\n"
+                f"--- UPLOADED CLINICAL DOCUMENT ---\n"
+                f"{pdf_text[:8000]}\n"  # Cap at 8000 chars to stay within token limits
+                f"--- END OF DOCUMENT ---\n\n"
+                f"Please analyze this clinical document thoroughly. Explain the findings, "
+                f"interpret any medical terminology, flag any abnormalities or concerns, "
+                f"and provide clear recommendations."
+            )
+            messages.append({"role": "user", "content": pdf_prompt})
         else:
+            # PDF extraction failed — inform user
             messages.append({
                 "role": "user",
-                "content": [
-                    {"type": "text", "text": message},
-                    {"type": "image_url", "image_url": {"url": image_url}}
-                ]
+                "content": (
+                    f"{message}\n\n"
+                    "[Note: A PDF document was uploaded but the text could not be extracted. "
+                    "Please ask the user to either copy-paste the report text into the chat, "
+                    "or upload a screenshot/image of the document instead.]"
+                )
             })
+
+    elif image_url and vision_ok:
+        # Image uploaded + model supports vision — send multimodal
+        messages.append({
+            "role": "user",
+            "content": [
+                {"type": "text", "text": message},
+                {"type": "image_url", "image_url": {"url": image_url}}
+            ]
+        })
+
     elif image_url and not vision_ok:
-        # Model does NOT support vision — add a note so the AI uses scan context data instead
-        image_note = "\n\n[System Note: The user's scan image is available but cannot be displayed to you. Use the scan context data provided in your system prompt to analyze and explain the findings. Do NOT tell the user you cannot see the image — just analyze using the scan data.]"
+        # Image available but model is text-only — rely on scan context data
+        image_note = (
+            "\n\n[The user's scan image is on file. Use the scan context data provided "
+            "in the system prompt to analyze and explain the findings thoroughly. "
+            "Do NOT tell the user you cannot see the image — analyze using the scan data.]"
+        )
         messages.append({"role": "user", "content": message + image_note})
+
     else:
+        # Plain text message
         messages.append({"role": "user", "content": message})
 
+    # ─── Call OpenRouter API ───
     try:
         async with httpx.AsyncClient(timeout=90.0) as client:
             response = await client.post(
@@ -118,7 +210,7 @@ async def get_chat_response(message: str, history: list = None, context: str = N
                 json={
                     "model": settings.OPENROUTER_MODEL,
                     "messages": messages,
-                    "max_tokens": 1200,
+                    "max_tokens": 1500,
                     "temperature": 0.7,
                 },
             )
@@ -130,92 +222,40 @@ async def get_chat_response(message: str, history: list = None, context: str = N
             if reply:
                 return reply.strip()
             else:
-                print(f"[WARN] Empty response from OpenRouter. Data: {data}")
-                return "I apologize, but I couldn't generate a response. Please try again."
+                print(f"[WARN] Empty response from OpenRouter. Full response: {data}")
+                return "I apologize, but I couldn't generate a response. Please try asking again."
 
     except httpx.TimeoutException:
         print("[ERROR] OpenRouter request timed out after 90s")
-        return "I'm sorry, the response is taking too long. Please try again in a moment."
+        return (
+            "I'm sorry, the AI model is taking too long to respond. This can happen with complex questions. "
+            "Please try again in a moment, or try a shorter question."
+        )
     except httpx.HTTPStatusError as e:
         error_body = e.response.text
-        print(f"[ERROR] OpenRouter API error: {e.response.status_code} - {error_body}")
-        # If it's a model error, provide more info
-        if e.response.status_code == 400:
+        status_code = e.response.status_code
+        print(f"[ERROR] OpenRouter API error {status_code}: {error_body}")
+
+        if status_code == 402:
             return (
-                "I encountered an issue processing your request. This may be due to the AI model configuration. "
-                "Please try asking your question again, or contact support if the issue persists."
+                "The AI service has run out of credits. Please update your OpenRouter API key "
+                "or add credits at https://openrouter.ai/credits."
             )
-        return _fallback_response(message)
+        elif status_code == 429:
+            return "The AI service is experiencing high demand. Please wait a moment and try again."
+        elif status_code == 400:
+            return (
+                "There was an issue processing your request. Please try rephrasing your question "
+                "or removing any attachments and trying again."
+            )
+        else:
+            return (
+                f"I encountered a temporary issue (error {status_code}). "
+                "Please try again in a moment."
+            )
     except Exception as e:
         print(f"[ERROR] Chat service error: {type(e).__name__}: {e}")
-        return _fallback_response(message)
-
-
-def _fallback_response(user_text: str) -> str:
-    """Provide a basic response when OpenRouter is not configured or unavailable."""
-    lower = user_text.lower()
-
-    if "explain" in lower and ("report" in lower or "scan" in lower or "latest" in lower):
         return (
-            "I'd love to help explain your scan report! Your DermaScreen analysis evaluates skin lesions "
-            "using AI-powered image classification. The report includes:\n\n"
-            "• **Condition**: The identified skin condition (e.g., Melanocytic Nevus, Benign Keratosis)\n"
-            "• **Confidence**: How certain the AI is about its classification (higher is more reliable)\n"
-            "• **Risk Level**: Low, Moderate, or High — based on the condition and ABCDE criteria\n"
-            "• **Clinical Notes**: ABCDE assessment (Asymmetry, Border, Color, Diameter, Evolution)\n\n"
-            "For a detailed AI-powered explanation, please ensure the backend AI service is properly configured. "
-            "In the meantime, we recommend sharing your report with a board-certified dermatologist."
-        )
-    elif "suspicious" in lower:
-        return (
-            "A **'Suspicious'** finding in your DermaScreen report means the AI has detected features in your "
-            "skin lesion that warrant closer medical attention. This does NOT automatically mean cancer, but it "
-            "indicates the lesion shows one or more concerning characteristics based on the ABCDE criteria:\n\n"
-            "• **A**symmetry — One half doesn't match the other\n"
-            "• **B**order — Edges are irregular, ragged, or blurred\n"
-            "• **C**olor — Multiple colors or uneven distribution\n"
-            "• **D**iameter — Larger than 6mm (pencil eraser size)\n"
-            "• **E**volution — The lesion is changing over time\n\n"
-            "**Recommended next steps**: Schedule an appointment with a dermatologist for a clinical examination "
-            "and possible dermoscopy. Many suspicious lesions turn out to be benign after professional evaluation."
-        )
-    elif "dermatologist" in lower or "doctor" in lower or "when should" in lower:
-        return (
-            "You should see a dermatologist in the following situations:\n\n"
-            "1. **Suspicious scan results** — If DermaScreen flags a lesion as suspicious or high-risk\n"
-            "2. **Changing moles** — Any mole that changes in size, shape, color, or starts bleeding/itching\n"
-            "3. **New growths** — Any new skin growth that appears suddenly, especially after age 30\n"
-            "4. **Persistent symptoms** — Rashes, itching, or skin irritation lasting more than 2 weeks\n"
-            "5. **Family history** — If you have family history of melanoma or skin cancer\n"
-            "6. **Annual screening** — Everyone should have an annual full-body skin check\n"
-            "7. **Sun damage** — History of severe sunburns or excessive UV exposure\n\n"
-            "**Don't delay** — early detection is crucial. The 5-year survival rate for early-stage melanoma "
-            "is over 99%. DermaScreen is a screening tool to help prioritize, but it does not replace "
-            "professional medical evaluation."
-        )
-    elif "melanoma" in lower or "cancer" in lower:
-        return (
-            "If you're concerned about potential melanoma or skin cancer, please schedule "
-            "an appointment with a dermatologist promptly. DermaScreen is a screening support "
-            "tool, not a definitive diagnostic device. Early detection is key — the 5-year "
-            "survival rate for early-stage melanoma is over 99%."
-        )
-    elif "treatment" in lower or "treat" in lower or "medicine" in lower or "cream" in lower:
-        return (
-            "Treatment depends on the specific skin condition identified. Common approaches include:\n\n"
-            "• **Benign moles**: Usually no treatment needed; monitor for changes\n"
-            "• **Seborrheic keratosis**: Cryotherapy, curettage, or leave alone if not bothersome\n"
-            "• **Dermatitis/Eczema**: Hydrocortisone cream (OTC), moisturizers, antihistamines\n"
-            "• **Fungal infections**: Clotrimazole or terbinafine antifungal cream (OTC)\n"
-            "• **Actinic keratosis**: Prescription fluorouracil cream, cryotherapy\n"
-            "• **Suspicious lesions**: Surgical excision biopsy by a dermatologist\n\n"
-            "For your specific condition, please share your scan results and I can provide "
-            "more targeted recommendations. Always consult a dermatologist before starting treatment."
-        )
-    else:
-        return (
-            "I understand your concern. Based on common dermatological guidelines, it's always "
-            "best to keep track of any skin changes — particularly asymmetrical moles, jagged "
-            "borders, color variations, or diameter growth (the ABCDEs of skin health). "
-            "If you have specific questions about your scan results, feel free to ask!"
+            "I'm experiencing a temporary issue connecting to the AI service. "
+            "Please try again in a moment."
         )
